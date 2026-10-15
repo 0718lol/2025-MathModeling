@@ -1,0 +1,160 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+\usepackage{titlesec}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdfstartview=FitH,
+    pdfpagemode=UseNone
+}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\titleformat{\section}{\large\bfseries}{\thesection.}{1em}{}
+\title{\heiti 全国大学生数学建模竞赛\\AI工具使用详情}
+% \author{\kaishu 参赛队编号：\underline{\hspace{4cm}}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\vspace{-5em}
+\section{所用AI工具名称和版本}
+\begin{itemize}
+    \item 豆包，字节跳动，2025年9月6日
+    \item Kimi，Moonshot AI，2025年9月6日
+    \item DeepSeek，深度求索，2025年9月7日
+\end{itemize}
+
+\section{具体使用目的与环节}
+\begin{itemize}
+    \item 高效解答论文撰写与建模中遇到的LaTeX具体技术问题。
+    \item 辅助论文撰写与排版，处理格式与规范类辅助事务。
+    \item 快速实现模型结果的可视化呈现，确保结果可复现且图示清晰美观。
+\end{itemize}
+\vspace{1em}
+\subsection*{交互1：LaTeX三线表格的迭代生成与精修}
+\textbf{使用工具：} kimi \quad \textbf{时间：} 2025年9月6日
+
+\textbf{提示词：}
+\begin{quote}
+“请根据图片内容制作一个符合学术规范的三线表格，并根据后续要求逐步修改：1. 解决特定行的排版问题；2. 去除表格内部所有横线，使其成为纯粹的三线表；3. 为合并单元格的代码添加注释。请给出最终版的LaTeX代码。”
+\end{quote}
+\textbf{AI回复摘要：}
+\begin{itemize}
+\item AI准确地将图片内容转换为LaTeX表格，并理解了“三线表”的规范，使用了专业的 \texttt{booktabs} 宏包。
+\item AI能够根据用户的追问进行迭代修改：首先使用 \texttt{makecell} 和 \texttt{multirow} 宏包解决了复杂单元格的排版和单元格合并问题；然后根据要求去除了内部的 \texttt{\textbackslash cmidrule}，生成了纯粹的三线表。
+\item 提供了包含完整环境和所需宏包的、可直接编译的最终代码，并按要求对关键的合并单元格命令（\texttt{\textbackslash multirow}）添加了详细的注释。生成的最终核心代码如下：
+\begin{quote}
+\small
+\begin{verbatim}
+\begin{table}[htbp]
+\centering
+\caption{符号说明}
+\label{tab:symbol_description_final}
+\begin{tabular}{cccccc}
+\toprule
+\textbf{情况} & \textbf{是否穿云} & \textbf{导弹与云心距离} & 
+\textbf{投影正负} & \textbf{遮挡情况} & \textbf{情况说明} \
+\midrule
+1 & 否 & R=10 & ε>0  & 遮挡 & \multirow{2}{*}{导弹穿入云团或与其相切} \
+2 & 否 & R=10 & ε≤0 & 未遮挡 & \
+3 & 否 & $R>10$ & $\varepsilon > 0$  & \makecell{遮挡, $d \le r$ 
+ \\ 未遮挡, $d > r$} & \multirow{2}{*}{导弹未进入云团} \\
+4 & 否 & $R>10$ & $\varepsilon \le 0$ & 未遮挡 & \\
+5 & 否 & $R<10$ & /                  & 遮挡 & 由于步长取值，
+    恰进入云团\\
+6 & 是 & $R=10$ & $\varepsilon \le 0$ & 未遮挡 & 
+\multirow{2}{*}{导弹恰穿出云团} \\
+7 & 是 & $R=10$ & $\varepsilon > 0$  & 遮挡 & \\
+8 & 是 & $R<10$ & /                  & 遮挡 & 导弹在云团外 \\
+9 & 是 & $R>10$ & $\varepsilon > 0$  & 未遮挡 & 
+    \multirow{2}{*}{导弹已穿出云团} \\
+10& 是 & $R>10$ & $\varepsilon \le 0$ & 遮挡 & \\
+    \bottomrule
+\end{tabular}
+\end{table}
+\end{verbatim}
+\end{quote}
+\item 在交互过程中，AI还诊断了用户可能遇到的排版错误（如缺少列分隔符 \texttt{\&}），并给出了排查建议和完整的最小工作示例。
+\end{itemize}
+\textbf{人工采纳与修改情况：}
+\begin{itemize}
+\item 我们采纳了AI提供的最终版、纯三线表格式的完整 \texttt{table} 环境代码块。
+\item 根据论文上下文，修改了表格的标题（\texttt{\textbackslash caption}）、标签（\texttt{\textbackslash label}）以及字体大小。
+\item 对“遮挡情况”列的对齐方式进行了微调，以获得更好的视觉效果。
+\end{itemize}
+
+
+\vspace{1em} % 与前文保持一定的垂直间距
+
+\subsection*{交互2：LaTeX 中多行公式对齐环境的选择}
+\textbf{使用工具：} deepseek \quad \textbf{时间：} 2025年9月6日 \\
+\textbf{提示词：}
+\begin{quote}
+“latex 公式怎么换行，使等号对齐”
+\end{quote}
+
+\textbf{AI 回复摘要：}
+\begin{itemize}
+    \item 明确指出实现该功能需使用 \texttt{amsmath} 宏包，并强调了对齐标记 \texttt{\&} 和换行符 \texttt{\textbackslash\textbackslash} 的核心作用。
+    \item 详细介绍了 \texttt{align} 和 \texttt{split} 两个主流环境，并对比了它们的核心区别：
+    \begin{itemize}
+        \item \textbf{\texttt{align}} 用于对齐多个独立的方程式，默认每行独立编号。
+        \item \textbf{\texttt{split}} 用于拆分单个过长的方程式，整个公式块只有一个居中编号，且必须嵌套在 \texttt{equation} 等环境中。
+    \end{itemize}
+    \item 建议在需要为单一方程式自定义编号时，使用 \texttt{align} 配合 \texttt{\textbackslash nonumber} 和 \texttt{\textbackslash tag\{...\}} 命令。
+    \item 警告用户避免使用过时的 \texttt{eqnarray} 环境，因其存在排版间距问题。
+\end{itemize}
+
+\textbf{人工采纳与修改情况：}
+\begin{itemize}
+    \item 在论文中统一使用 \texttt{align} 和 \texttt{split} 环境处理所有多行公式，完全弃用 \texttt{eqnarray}。
+    \item 采纳了 \texttt{align} + \texttt{\textbackslash nonumber} 的组合用法，对公式推导步骤进行了清晰的、非连续的编号，增强了可读性。
+    \item 采纳了在 \texttt{split} 环境的续行中使用 \texttt{\textbackslash quad} 缩进的排版建议，使公式的层次结构更加清晰。
+\end{itemize}
+
+\subsection*{交互3：论文内容语言润色}
+\textbf{使用工具：} deepseek \quad \textbf{时间：} 2025年9月7日 \\
+\textbf{提示词：}
+\begin{quote}
+“我们的目标是使总有效遮蔽时间最长，由上文得总有效遮蔽时间 $\Omega = \left\{ t \middle| \forall p \in D, Y^p = 1 \right\}$，本问及后续小问中遮蔽时间不再满足连续性条件……请你润色一下我的语言”
+\end{quote}
+
+\textbf{AI 回复摘要：}
+\begin{itemize}
+    \item 指出本问中遮蔽时间不再是连续区间，而是由若干个分散时刻构成的集合，需采用集合的测度进行建模。
+    \item 优化了表述方式，使其更符合数学建模论文规范：遮蔽时间集合为 $\Omega = \left\{ t \mid \forall p \in D, Y^p = 1 \right\}$，目标函数为最大化其测度。
+    \item 建议使用 $\operatorname{meas}(\Omega)$ 表示集合的“时间长度”，并说明如需更严谨表达可改为 Lebesgue 测度 $\mu(\Omega)$。
+    \item 给出标准目标函数写法：$\max\ T_{\text{总}} = \operatorname{meas}(\Omega)$。
+\end{itemize}
+
+\textbf{人工采纳与修改情况：}
+\begin{itemize}
+    \item 将原目标函数从“最大化遮蔽时长”表述调整为“最大化遮蔽时间集合的测度”，更具数学严谨性。
+    \item 采用集合符号和逻辑量词描述遮蔽条件，提升模型表达的规范性。
+    \item 在建模论文中正式使用 $\operatorname{m}(\Omega)$ 表达非连续遮蔽时间总长。
+\end{itemize}
+
+
+\vspace{1em}
+\section{总结与声明}
+
+\noindent
+本参赛队在竞赛过程中，严格遵守全国大学生数学建模竞赛组委会关于AI工具使用的相关规定。所有核心建模思想、模型构建、算法推导与最终分析结论，均由我队独立完成。AI工具仅用于查阅文献、排版优化、辅助编程与理论支持等环节，所用内容均经过人工审核与修改，特此说明。
+
+\vspace{2em}
+\noindent
+\hfill 日期：2025年9月7日
+
+\end{document}

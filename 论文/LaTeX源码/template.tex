@@ -1,0 +1,2169 @@
+%! Mode:: "TeX:UTF-8"
+%! TEX program = xelatex
+\PassOptionsToPackage{quiet}{xeCJK}
+\documentclass[withoutpreface,bwprint]{cumcmthesis}
+
+% ==========================================================
+%            1. CLS 未加载的补充宏包
+% ==========================================================
+% --- 数学公式和符号 ---
+\usepackage{bbding}     % 提供特殊符号，如对勾、星号
+\usepackage{pifont}     % Pi 字体宏包，提供多种符号
+
+% --- 图形与颜色 ---
+\usepackage{tikz}       % 强大的绘图宏包, \circled 命令需要它
+
+% --- 表格、列表与浮动体 ---
+\usepackage{wrapfig}    % 实现文字环绕图片或表格
+\usepackage{placeins}   % 提供 \FloatBarrier 命令, 控制浮动体位置
+
+% --- 参考文献与链接 ---
+\usepackage[numbers,sort&compress]{natbib}  % 文献管理宏包
+
+% --- 算法环境 ---
+\usepackage{algorithm}     % 定义算法的浮动体环境
+\usepackage{algpseudocode} % 提供编写伪代码的具体命令
+\captionsetup[algorithm]{labelsep=colon}  % 设置算法标题的冒号分隔符
+
+% --- 其他辅助宏包 ---
+\usepackage{lipsum}    % 用于生成示例文本
+\usepackage{siunitx}   % 用于科学数字和单位排版 
+
+% ==========================================================
+%            2. 模板自带宏包
+% ==========================================================
+\usepackage{etoolbox}
+\usepackage[framemethod=TikZ]{mdframed}  % 框架宏包
+\usepackage{url}  % 网页链接宏包
+\usepackage{subcaption}  % 子图宏包
+
+% ==========================================================
+%              3. 自定义命令与格式设置
+% ==========================================================
+% --- 页面布局 (可选, 用于覆盖 CLS 默认的 25mm 边距) ---
+% \geometry{margin=30mm} % 如果需要, 在此修改页边距
+
+% --- 编号格式 ---
+\numberwithin{equation}{section} % 公式编号与章节号关联, 如 (2.1)
+\renewcommand{\theequation}{\arabic{section}-\arabic{equation}} % 自定义公式编号显示格式为 2-1
+
+% --- 让图、表编号与章节号关联 ---
+\numberwithin{figure}{section} % 1. 让图的编号在每个 section 后重新开始
+\numberwithin{table}{section}  % 2. 让表的编号在每个 section 后重新开始
+
+\renewcommand{\thefigure}{\arabic{section}-\arabic{figure}} % 3. 定义图的编号格式为 "章节号-图号"
+\renewcommand{\thetable}{\arabic{section}-\arabic{table}}   % 4. 定义表的编号格式为 "章节号-表号"
+
+% --- 表格格式 ---
+\BeforeBeginEnvironment{tabular}{\zihao{-5}} % 全局设置表格内字号为小五
+\newcolumntype{C}{>{\centering\arraybackslash}X} % 为 tabularx 定义居中的新列类型 C
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X} % 为 tabularx 定义居右的新列类型 R
+\newcolumntype{L}{>{\raggedright\arraybackslash}X} % 为 tabularx 定义居左的新列类型 L
+
+% --- 自定义命令 ---
+\newcommand*\circled[2]{\tikz[baseline=(char.base)]{\node[shape=circle,draw,inner sep=1.5pt] (char) {#1#2};}} % 定义一个画圈命令
+\titlespacing*{\section}{0pt}{2ex}{1.5ex}%减小一级标题上的间隔
+\renewcommand{\baselinestretch}{1.1}
+
+\renewcommand{\alglinenumber}[1]{\makebox[1.5em][r]{#1:}} % 强制所有行号都占用相同的固定宽度
+% ==========================================================
+%                     4. 算法环境汉化
+% ==========================================================
+\makeatletter
+\AtBeginDocument{
+  \renewcommand{\ALG@name}{算法}
+  \renewcommand{\algorithmicrequire}{\textbf{输入:}}
+  \renewcommand{\algorithmicensure}{\textbf{输出:}}
+}
+\makeatother
+\algrenewcommand\alglinenumber[1]{\large{#1}\hspace{1em}} % 增大算法行号字号并增加间距
+
+
+% ==========================================================
+%                  5. listings 代码语言定义
+% ==========================================================
+% --- 开始定义 SPSS 语言 ---
+\lstdefinelanguage{SPSS}{
+  sensitive=true, % 关键字大小写敏感
+  morekeywords={
+    % 常用的数据处理和过程命令
+    GET, FILE, SAVE, OUTFILE, DATASET, ACTIVATE, ADD, VALUE, LABELS,
+    VARIABLE, LABELS, COMPUTE, RECODE, IF, DO, IF, END, LOOP,
+    FREQUENCIES, DESCRIPTIVES, CROSSTABS, MEANS, T-TEST, ONEWAY,
+    GLM, UNIANOVA, MANOVA, REGRESSION, CORRELATIONS, FACTOR,
+    EXECUTE, ALL, AND, BY, EQ, GE, GT, LE, LT, NE, NOT, OR, TO, WITH
+  },
+  morecomment=[s]{/*}{*/}, % 块注释 /* ... */
+  morecomment=[l]*,         % 行注释 *
+  morestring=[s]'",         % 字符串 '...' 和 "..."
+  morestring=[s]"",
+}
+% --- 结束定义 SPSS 语言 ---
+
+% ==========================================================
+%                       论文信息
+% ==========================================================
+\title{无人机投放烟幕干扰弹模型与优化策略研究}  % 论文标题
+\tihao{}  % 题号
+\baominghao{}  % 报名号
+\schoolname{}  % 学校
+\membera{}  % 队员a
+\memberb{}  % 队员b
+\memberc{}  % 队员c
+\supervisor{}  % 指导老师
+\yearinput{}
+\monthinput{}
+\dayinput{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 正文
+\begin{document}
+
+\maketitle
+\begin{abstract}
+ 本文针对无人机投放烟幕弹的多重决策问题， 建立了一套针对不同场景的决策优化模型。结合运动学、几何学与智能启发算法，给出相应的最优决策方案，实现对目标有效遮蔽时长的最大化。
+
+\textbf{对于问题一},要求根据已知参数计算烟幕弹的有效遮蔽时长。本文基于物理规律与向量推导，精确刻画了导弹、烟幕弹及烟幕云团在平抛与匀速下沉阶段的运动轨迹，建立了静态场景下有效遮蔽时长的计算模型。接着根据立体几何原理，本文引入\textbf{高斯曲率}，严格证明了目标遮挡的有效判据为上、下底面边缘点集是否全被遮挡。本文据此建立了描述\textbf{极限遮蔽状态的非线性方程组}，求解得到在给定的策略下，单枚烟幕弹对导弹M1的总有效遮蔽时长为\textbf{1.400555}秒。最后对模型进行\textbf{灵敏度分析}和\textbf{鲁棒性分析}，说明模型精度较高且稳定性好。
+
+\textbf{对于问题二},本文建立以无人机航向角、速度、烟幕弹投放与起爆时刻为决策变量的\textbf{单目标优化模型}，创新性地引入导弹是否\textbf{穿云}对遮蔽情况的影响，并结合\textbf{垂距公式}与\textbf{向量投影系数}，构建了完备的导弹遮蔽判定准则。考虑到遮蔽时间连续，本文采用\textbf{由粗到细}的二分搜索法确定遮蔽首末时刻并计算遮蔽时长，并通过\textbf{梯度化适应度粒子群算法}求解模型。结果显示，最优策略为航向角\textbf{6.67°}、速度\textbf{137.53 m/}s、投放点为\textbf{0.066 s}、起爆点为\textbf{0.772 s}，总有效遮蔽时间为\textbf{4.587695 s}。
+
+\textbf{对于问题三}，本文在问题二模型基础上，补充对\textbf{多云团遮蔽情况}的详细分析，并将目标点采样范围修正为圆柱侧面与上底面。考虑到此时遮蔽时长不再连续，本文用\textbf{测度}量化遮蔽时长。通过\textbf{向量化矩阵运算}与\textbf{变步长二分搜索}对已有粒子群算法进行改进，可求得总有效遮蔽时长为\textbf{6.4031 s}，并进行可视化分析。结果详见result1.xlsx。
+
+\textbf{对于问题四},本文在问题三基础上引入无人机分配变量，采用全局搜索能力更强的混合进化算法求解。结果表明，该场景下的遮蔽时长进一步提升，得到总有效遮蔽时长为\textbf{11.134009秒}，结果详见result2.xlsx。
+
+\textbf{对于问题五},本文将遮挡判定条件重构为三导弹视线均被遮挡，并构建了\textbf{联合遮蔽优化模型}，以\textbf{遮蔽时间交集测度最大化}为目标函数，融合三导弹遮蔽轨迹并行判别、时空约束与组合规划算法，在高维复杂空间中实现最优解的搜索，最终获得总遮蔽时长为\textbf{20.31秒}，对应策略详见result3.xlsx。
+
+% \textbf{本文特色}：本文建立了融合运动学、几何学与摄影图像原理的可验证遮蔽判据，提出投影—垂距复合遮蔽判定框架，结合梯度化适应度的粒子群算法解决复杂可行域优化问题，实现了从单弹优化到多导弹联合干扰的建模升级，具有良好的工程实用性与算法泛化性。
+
+\textbf{\keywords{改进粒子群优化算法\quad  射影几何 \quad 高斯曲率 \quad 向量化矩阵运算 \quad 变步长二分搜索}}
+\end{abstract}
+\vspace{-0.5em}
+\section{问题重述}
+\subsection{问题背景}
+
+本文探究在现代军事防御场景中，利用无人机投放烟幕干扰弹以保护高价值目标免受精确制导导弹攻击的优化策略问题。防御系统包括一个真目标和一个为其提供掩护的假目标，坐标系以假目标为原点建立。来袭的空地导弹以300 m/s的速度直线飞向假目标，当警戒雷达探测到多枚来袭导弹时，控制中心会立即向待命的无人机指派拦截任务，通过投放烟幕弹形成一个短暂的、可移动的遮蔽云团，来阻断导弹的瞄准视线。
+
+无人机接收任务后，可瞬时调整航向，并以70-140 m/s范围内的某一恒定速度及高度作匀速直线飞行。无人机投放的烟幕弹在重力作用下下落，并在预定时间引爆，形成一个半径为10米、可持续提供20秒有效遮蔽的球状烟幕云团，该云团会以3 m/s的速度匀速下沉。为实现最优防御效果，需要建立数学模型，优化无人机的飞行路径、速度，以及烟幕弹的投放与引爆时机，以达到最大化对真实目标的总有效遮蔽时间的总目标。
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\vspace{-0.5em}
+\subsection{问题提出}
+
+为解决烟幕干扰弹的投放策略优化问题，实现更有效的烟幕干扰效果，需建立数学模型解决以下问题：
+
+\textbf{问题1：} 无人机FY1以120 m/s的速度飞向假目标，在受领任务1.5秒后投放一枚烟幕弹，该弹于3.6秒后引爆。求解此策略下烟幕弹对导弹M1的有效遮蔽时长。
+
+\textbf{问题2：}允许无人机FY1自主选择飞行方向和速度，并决定其所投放的一枚烟幕弹的投放点与引爆点。目标是设计一个最优策略，使对导弹M1的有效遮蔽时间尽可能长。
+
+\textbf{问题3：}在问题一、二的基础上，可投放烟幕弹的数量增加到3枚，要求给出一套完整的投放策略，包括每枚弹的投放与引爆细节，以实现对导弹M1的干扰。
+
+\textbf{问题4：}要求利用FY1, FY2, FY3三架无人机，各投放一枚烟幕弹，协同对导弹M1进行干扰。重新设计相应的协同投放策略。
+
+\textbf{问题5：}5架无人机全部可用，每架最多可投放3枚烟幕弹，以应对M1, M2, M3三枚导弹攻击。要求给出一套最优的烟幕弹投放策略，以实现有效遮蔽时间的最大化。
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\vspace{-0.5em}
+\section{问题分析}
+\vspace{-0.5em}
+% \subsection{问题一分析}
+\textbf{对于问题一，}要求在无人机速度及方向、烟幕干扰弹投放点和起爆点给定的预设条件下，求算烟幕干扰弹对真目标的最长遮蔽时间。
+
+利用物理运动学知识，可以求得导弹、无人机、烟幕弹和烟幕云团的轨迹方程，同时根据数学几何知识可以得出点与直线的距离，进而求得圆柱体被遮蔽的判定条件，随后求解方程组可以得到导弹开始遮蔽和结束遮蔽的时刻，两时刻相减即为总遮蔽时长。
+
+% \subsection{问题二分析}	
+
+\textbf{对于问题二，}不再限制无人机速度及方向等问题一中给定的参数，求算最长有效遮蔽时间。同样地，可以在问题一模型的基础上添加约束条件，同时对问题一的遮蔽判定条件加以完善，如考虑出云团时的情况，进而转化为一个简单单目标优化问题求解。
+% \vspace{-0.5em}
+% \subsection{问题三分析}
+
+\textbf{对于问题三，}可用无人机数量不变，可投放的烟幕干扰弹数量增加到3个，要求给出最优投放策略。本问中决策变量增加为8个，将单目标优化问题变为协同规划。与前两问不同，本问中需要考虑多个云团协同遮蔽的情况，关键在于处理三枚烟幕弹在三维坐标系下的时空关系，并满足投放间隔约束，模型的目标函数相应地变为最大化多个遮蔽时间集合的并集测度，同样对模型进行优化求解。
+
+% \vspace{-0.5em}
+% \subsection{问题四分析}
+
+\textbf{对于问题四，}可用无人机数量增加到3架，但每架无人机可投放的烟幕干扰弹只有一枚，协同对一个来袭导弹进行干扰，要求给出最优投放策略。本题可以对问题三模型进行改进，添加无人机编号变量$j$，决策变量仍为8个，对约束条件进行必要补充，再结合问题三给出的优化模型进行求解。
+% \vspace{-0.5em}
+% \subsection{问题五分析}
+
+\textbf{对于问题五，}将场景升级为5架可投放3枚烟幕干扰弹的无人机共同防御3枚来袭导弹。相比前四问，导弹的数量不再只有一个，因此有效遮蔽必须是对三枚导弹的同时遮蔽，利用问题四模型分别求算出三枚导弹各自的有效遮蔽时间，再通过取交集可以求算出真正的有效遮蔽时间。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\vspace{-0.5em}
+\section{模型假设}
+
+为保证模型的准确性与合理性，本文结合实际情况，排除部分干扰因素，做出以下假设：
+
+\begin{itemize}[itemindent=2em]
+\item \textbf{假设1} 无风场因素干扰，烟幕干扰弹爆炸后形成的烟幕云团水平速度为零；
+\item \textbf{假设2} 不考虑烟幕云团在消散前坠地的影响；
+\item \textbf{假设3} 为提升结果准确性，本文g取9.80665$m/s^2$；
+\item \textbf{假设4} 不考虑起爆时，导弹恰好在该云团内部；
+\item \textbf{假设5} 当导弹发现真目标时会立刻改变方向销毁真目标。
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\vspace{-0.5em}
+\section{符号说明}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{c Y c}
+\toprule
+\textbf{符号}    & \textbf{含义}    & \textbf{单位} \\
+\midrule
+$P_{j,i}$ & 第$j$架无人机投掷的第$i$枚烟幕弹坐标 & $/$ \\
+$M_K(t)$ &$t$时刻编号为$k$导弹的坐标 & $m$ \\
+$C_S$ &烟幕云团中心坐标& $m$ \\
+$x$ & 烟幕干扰弹的X轴坐标 &$ m$ \\
+$y$ & 烟幕干扰弹的Y轴坐标 & $m$\\
+$z$ & 烟幕干扰弹的Z轴坐标 & $m$ \\
+$t$ & 距雷达发现导弹时刻的时间 & $s$ \\
+$v_D$ & 烟幕干扰弹的初速度 & $m/s$ \\
+$v_S$ &烟幕云团匀速下降的速度 &$m/s$\\
+$\vec{e}$ & 单位方向向量 & $/$\\
+$\gamma$ & 轮廓曲率 & $/$ \\
+$d(t, P)$ & 烟幕云团中心到导弹视线的垂距 &$ m$ \\
+$\Omega $ & 有效遮蔽时间集合 &$s$ \\
+$\alpha$ & 无人机航向角& $^\circ$ \\
+$\sigma_t$& $t$时刻向量投影 & $/$ \\
+$\varepsilon$ & 视线段归一化投影系数 & $/$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\newpage
+\section{问题一的模型的建立和求解}
+
+本题要求在给定无人机飞行方向及飞行速度、以及烟幕弹的投放时机和起爆时机的前提下，求解烟幕干扰弹对导弹M1的有效遮蔽时长。不考虑风场等物理因素的干扰，本题可以视作一个静态场景。
+% 本文建立坐标系后，将依次对云团、导弹、遮蔽情况及时长进行分析，最终汇总模型。
+
+\subsection{静态场景下有效遮蔽时长的计算模型建立}
+\begin{wrapfigure}{r}{0.45\textwidth} % 将图片放在右边，宽度为文本宽度的45%
+    \vspace{-30pt} % 可选：向上微调图片位置，减少图片上方的空白
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/初始时刻各物体的位置.png} % 插入图片，宽度稍小于wrapfigure的宽度
+    \caption{初始时刻各物体的位置} % 图片标题
+    \label{fig:3Dplot}
+    \vspace{-60pt} % 可选：向下微调图片位置，减少图片下方的空白
+\end{wrapfigure}
+
+为清晰计算烟幕干扰弹对M1的有效遮蔽时长，我们分别建立无人机FY1、导弹M1和烟幕云团的运动轨迹模型，接着对有效遮蔽的情况与时长进行分析，模型建立过程如下：
+\subsubsection{建立笛卡尔三维坐标系}
+
+为对问题中的场景进行精确的数学描述，我们以假目标的中心为坐标原点 $O(0,0,0)$,水平面定义为 $xy$ 平面，垂直于水平面向上的方向为 $z$ 轴正方向,建立了一个三维右手笛卡尔坐标系 $(O-xyz)$，如图\ref{fig:3Dplot}所示。
+
+\subsubsection{烟幕云团的轨迹方程}
+
+设本问中烟幕干扰弹在运动过程中的坐标为$P_1(x_1(t), y_1(t), z_1(t))$，简记为$P_1(t)$，由题目得其初始位置为$P_1(0) = (17800,0,1800)$。要求得其运动轨迹方程，主要分为三个阶段求解，第一阶段烟幕干扰弹跟随无人机FY1做朝向假目标方向的等高度匀速直线运动；第二阶段烟幕干扰弹被投放，由于拥有水平方向的初速度，在重力作用下做平抛运动；第三阶段烟幕干扰弹在空中完成爆炸，瞬时形成烟幕云团，由题意知该烟幕云团以3m/s的速度匀速下沉，水平方向速度变为零，直到云团消散。
+
+\textbf{（一）匀速直线运动阶段：}
+
+在此阶段无人机载着烟幕干扰弹以$120\text{m/s}$的初速度等高度匀速飞行,方向为朝着假目标(原点)的位置，烟幕干扰弹的三维坐标的计算公式为：
+\begin{equation}
+\left\{
+\begin{aligned}
+  & x(t) = 17800 - v_{D1}t \\
+  & y(t)=0 \\
+  & z(t)=1800
+\end{aligned}
+\right.
+\end{equation}
+
+此阶段烟幕干扰弹在三维笛卡尔坐标系下的坐标为：
+\begin{equation}
+    P_1(x(t), y(t), z(t))= (17800 - v_{D1}t, 0, 1800)
+\end{equation}
+
+其中，时间需满足$0 \le t \le t'$，第一问中投放烟幕干扰弹时间$t' = 1.5s$，无人机速度为$v_{D1} = 120m/s$。
+
+\textbf{（二）平抛阶段：}
+
+在此阶段无人机将烟幕干扰弹完成投放,由于Y轴坐标始终为零，我们对其在X-Z平面上进行运动学分析，我们对无人机做受力分析，在问题背景下忽略空气阻力，仅受自身重力，在z轴方向上做自由落体运动。其余方向不受力。因此无人机将在空中做水平初速度为$120\text{m/s}$的平抛运动，如下图所示：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/问题一烟幕弹运动分析图.jpg}
+    \caption{问题一烟幕云团轨迹示意图}
+    \label{fig:trace_plot}
+\end{figure}
+
+如图，我们可以将平抛曲线运动分解为水平和竖直方向上的直线运动，水平方向的速度为$120\text{m/s}$，则X轴坐标为：
+\begin{equation}
+    x(t)=17800 - v_{D1}t
+\end{equation}
+垂直方向上受到重力作用，做自由落体运动，加速度为g，依据假设，加速度g取为9.80665。根据能量守恒定律计算，Z轴坐标为：
+\begin{equation}
+    z(t)=1800 - \frac{1}{2}g(t - t')^2
+\end{equation}
+
+故此阶段烟幕干扰弹在三维笛卡尔坐标系下的坐标为：
+\begin{equation}
+   P_1(x(t), y(t), z(t)) = \left(17800 - v_{D1}t,0, 1800 - \frac{1}{2}g(t - t')^2\right)
+\end{equation}
+
+其中，时间满足$t' \leq t \leq t''$，在本小问中，烟幕干扰弹起爆时间$t_{1}'' = 1.5 + 3.6 = 5.1\text{s}$。
+
+\textbf{（三）匀速下落阶段：}
+
+在此阶段烟幕干扰弹完成爆炸，形成烟幕云团,我们的问题转为求解烟幕云团的运动轨迹。我们仍对其在X-Z平面上进行分析，根据题意，烟幕云团以$3\text{m/s}$的速度匀速下沉，水平速度变为0。
+
+则烟幕云团的三维坐标的计算公式分别为：
+\begin{equation}
+\left\{
+\begin{aligned}
+  & x(t) = 17800 - v_{D1}t''\\
+  & y(t)=0 \\
+  & z(t)=1800-\frac{1}{2}g(t''-t')^2-3(t-t'')
+\end{aligned}
+\right.
+\end{equation}
+
+% 此阶段烟幕干扰弹在三维笛卡尔坐标系下的坐标为：
+整理得：
+\begin{equation}
+    P_1(x(t), y(t), z(t)) = \left(17800 - v_{D1}t'',0, 1800-\frac{1}{2}g(t''-t')^2-3(t-t'')\right)
+\end{equation}
+
+题中指出云团在起爆20秒后消散，故时间满足$t_{1}'' \leq t \leq t''+20$。
+
+烟幕云团的轨迹方程可总结为：
+\begin{equation}
+\left\{
+\begin{aligned}
+P_1(t) &= (17800 - v_{D1}t, 0, 1800) 
+    && 0 \le t \le t' \\
+P_1(t) &= \left(17800 - v_{D1}t,0, 1800 - \frac{1}{2}g(t - t'')^2\right) 
+    && t' \le t \le t'' \\
+P_1(t) &= \left(17800 - v_{D1}t'',0, 1800-\frac{1}{2}g(t''-t')^2-3(t-t'')\right)
+    && t''\le t \le t''+20
+\end{aligned}
+\right.
+\end{equation}
+
+\subsubsection{导弹M1的轨迹方程}
+
+设导弹 $M_1$ 的坐标为$M_1(t)$，其初始位置为 $M_1(0) = (20000,0,2000)$。由题意得，导弹M1以$300m/s$的初速度朝向假目标（原点）飞行，运动轨迹可抽象为简单的匀速直线运动。令$\vec{e}_1$ 为原点 $O$ 指向导弹 $M_1$ 的单位方向向量：
+
+\begin{equation}
+    \vec{e}_1 = \frac{(20000,0,2000)-(0,0,0)}{|OM_1|}=\frac{(20000,0,2000)}{|OM_1|}
+\end{equation}
+
+则用向量表示导弹 $M_1$ 位置为:
+\begin{equation}
+    M_1(t) = (20000,0,2000) - 300\vec{e}_1 t
+\end{equation}
+
+\subsubsection{有效遮蔽的情况分析}
+\label{sec:effective_shielding}
+
+为计算遮挡时长，需确定圆柱体目标在球形遮挡物下的临界遮蔽时间。由于目标具有体积，故不能简单看作质点，而需详细刻画其可见部位。根据视觉几何原理，可见轮廓为表面法向量与视线方向垂直的边界点，这些点形成图像边缘，是我们识别的关键。因此在极限遮蔽状态（视线与球体相切）下，圆柱体的最后可见轮廓可能出现在以下三处：（1）上底面或下底面的边缘弧线；（2） 既包括底面边缘又包括侧边；（3）仅侧边直线部分。
+
+
+三种遮蔽情形示意图如下：
+
+
+% 为计算遮挡时长，需计算遮挡临界时间，明晰临界情形下的遮挡情况。本题中真目标并非理想质点（如真目标下底面圆心），而是具有体积的圆柱体。因此在判断导弹是否能观测到目标时，需要对目标详细刻画，是圆柱体的什么部位，恰好被导弹观测到？应该去圆柱体上的哪些点判断？
+
+
+% 因此我们需要结合几何知识对其遮蔽情况进行详细分析。根据视觉几何原理，在固定视角下，首先进入视野的是物体的\textbf{可见轮廓}，即表面法向量与视线方向垂直处的边界点，这些边界在图像中形成明显的边缘，是人眼或导弹识别系统优先感知的区域。因此，目标在被球形遮挡物逐渐遮蔽的过程中，其最后可见部分应落在这些轮廓上。
+
+% 基于此，我们分析在极限遮蔽状态下（视线与遮挡球体相切），圆柱体的最后可见轮廓可能出现的位置。由题意知，三维欧氏空间中有一圆柱体 $C$ 与一球面 $S$，观察点$O$位于三维空间中，使得圆柱体不被完全遮挡。考虑其结构，圆柱体的轮廓包括上下底面的边缘弧线与侧边的直线部分。显然，圆柱体被遮蔽情况可分为三种：第一种只露出上表面或下表面边缘；第二种既露出上表面或下表面又露出侧边；第三种只露出侧边，三种情况的示意图如下：
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{figures/问题一仅露出上下底面轮廓_1.jpg}
+        \caption{仅露出上下底面轮廓}
+        \label{fig:top_bottom_contour}
+    \end{subfigure}
+    \hspace{\fill} % 在子图之间添加弹性水平空白
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{figures/问题一露出上下底面弄轮廓和侧轮廓_2.jpg}
+        \caption{露出上下底面轮廓和侧轮廓}
+        \label{fig:top_bottom_side_contour}
+    \end{subfigure}
+    \hspace{\fill} % 在子图之间添加弹性水平空白
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{figures/问题一仅露出侧轮廓_3.jpg}
+        \caption{仅露出侧轮廓}
+        \label{fig:side_contour}
+    \end{subfigure}
+    
+    \caption{圆柱体被遮挡时的典型可见轮廓情形示意图} % 这是整个图片组的总标题
+    \label{fig:cylinder_contours} % 这是整个图片组的标签
+\end{figure}
+
+
+根据实际推断，极限遮蔽下仅可能出现情形（a），另外两种情形均不成立，下文将给出详细证明：
+
+考虑到遮挡物与目标轮廓的凸凹性，我们引入高斯曲率进行几何刻画，将三维空间中的观察点、圆柱体与球体在像平面上作中心投影，记球的投影外轮廓为圆弧集合 \(\Gamma=\partial\pi(S)\)，由 \(\Gamma\) 围成的闭盘为 \(D\)。设圆柱在像平面上的轮廓含有一条来自侧面的线段 \(L\)，端点为 \(A,B\)。  
+
+平面曲线的有向轮廓曲率公式\upcite{some_paper}为：
+\begin{equation}
+\kappa(t) = \frac{\lvert \gamma'(t) \times \gamma''(t) \rvert}{\lvert \gamma'(t) \rvert^{3}}
+\end{equation}
+\begin{equation}
+    \gamma(t)=(x(t),y(t))
+\end{equation}
+
+由投影几何可知，遮挡物在像平面上的可见外轮廓为圆，其任一点曲率为正。圆柱侧边在像上是直线段 \(L\)，对 \(L\) 上任一点曲率为0。
+
+基于此，对(b)(c)两种极限遮蔽情况分析如下：
+
+\begin{wrapfigure}{r}{0.45\textwidth} % 将图片放在右边，宽度为文本宽度的45%
+    \vspace{-20pt} % 可选：向上微调图片位置，减少图片上方的空白
+    \centering
+    \includegraphics[width=0.38\textwidth]{figures/仅露出侧轮廓分析图.jpg}
+    \caption{仅露出侧轮廓分析图} % 图片标题
+    \label{fig:only_side}
+    \vspace{-10pt} % 可选：向下微调图片位置，减少图片下方的空白
+\end{wrapfigure}
+
+% \begin{itemize}[label={\Large\textbullet}, leftmargin=\parindent, itemindent=1em]
+% \item{\textbf{仅露出侧轮廓}}
+% \end{itemize}
+
+\vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{1} \textbf{仅露出侧轮廓：}
+
+不妨设上下表面均被球遮挡，但侧边直线段 $L$ 的内段 $I$ 在像平面上可见，端点 $A,B$ 与上下表面均落在遮挡区域 $D$。在靠近 $A,B$ 的接口处，像上可见边界两端分别来自球的投影轮廓和侧边直线，但由于球的投影边界为处处 $\kappa>0$ 的光滑凸曲线，若其在开区间内与直线段相接，则在接口处曲率由大于零的数突跳为 $0$，会违背几何性质，故此情形不可能发生。
+
+% 由 $D$ 的凸性与 $A,B\in D$ 可知整段 $\overline{AB}=L\subset D$，从而 $I\subset D$，不可能同时作为可见部分 $D^{c}$，与假设相矛盾，故此情形不可能发生。
+
+
+% 假设存在一种极限遮蔽构型，使得圆柱体上下底面均被遮挡，但其侧边投影直线段 $L$ 的某个开内区间 $I \subset L$ 在像平面上可见。
+
+% 球体在像平面上的投影区域 $D$ 是一个严格凸集。 $A \in D$ 且 $B \in D$，$I \subset L$，且 $I$ 可见。根据定义，$I \subset D^c$。
+
+
+% 由凸集的定义，对于任意两点 $A, B \in D$，连接这两点的闭合线段 $\overline{AB}$ 必须完全包含在集合 $D$ 内部：
+%     \begin{equation}
+%         \forall A, B \in D \implies \overline{AB} \subset D
+%     \end{equation}
+% 在本问题中，已知 $A \in D$ 且 $B \in D$。
+% 又因为侧边轮廓 $L$ 的投影即为线段 $\overline{AB}$，由式 (1) 可直接推得：
+%     \begin{equation}
+%         L = \overline{AB} \subset D
+%     \end{equation}
+% 这意味着直线段 $L$ 上的所有点，包括其任意子集，都必须位于遮蔽区域 $D$ 内。因此，其内段 $I$ 也必然满足：
+%     \begin{equation}
+%         I \subset L \implies I \subset D
+%     \end{equation}
+%     \item 此结论 ($I \subset D$) 与我们的初始假设条件 $I \subset D^c$ 产生了直接矛盾。一个非空集合 $I$ 不可能同时被一个集合及其补集所包含。
+%     $$
+%     (I \subset D) \land (I \subset D^c) \implies I = \emptyset
+%     $$
+%     这与 $I$ 是一个可见的开区间（非空）的假设相悖。
+
+
+% 初始假设不成立。因此，仅有侧边轮廓可见的情形不可能发生。
+
+% 不妨设圆柱体上下表面均被球遮挡，且侧边的内段 \(I\subset L\) 在像上可见，而 侧边直线段\(L\) 的端点 \(A,B\) 及上下表面均在被遮挡区域 \(D\) 内。于是在像平面上可见边界处，在靠近两端点的接口处，轮廓由球的凸轮廓与侧边的直线段相接，前者曲率大于0，后者等于0。
+
+% 但根据平面曲线的曲率性质，若一条光滑凸曲线段与一段直线段在开区间内相接的部分，則在接点处曲率必须发生不连续突变，要求轮廓光滑或至少为连续边界。球的投影区域 \(D\) 是凸的，既然 \(A,B\in D\)，则整条线段 \(\overline{AB}=L\) 必属于 \(D\)，从而 \(L\) 的内段 \(I\) 不能位于 \(D^c\)，矛盾。
+
+
+% \begin{itemize}[label={\Large\textbullet}, leftmargin=\parindent, itemindent=1em]
+% \item{\textbf{露出上下底面轮廓和侧轮廓}}
+% \end{itemize}
+
+\vspace{1em} % 增加一点垂直间距
+\circled{\large}{2} \textbf{露出上下底面轮廓和侧轮廓：}
+
+\begin{wrapfigure}{r}{0.45\textwidth} % 将图片放在右边，宽度为文本宽度的45%
+    \vspace{-30pt} % 可选：向上微调图片位置，减少图片上方的空白
+    \centering
+    \includegraphics[width=0.38\textwidth]{figures/露出上下底面轮廓和侧轮廓.jpg}
+    \caption{露出上下底面轮廓和侧轮廓} % 图片标题
+    \label{fig:up_and_bottom_and_side}
+    \vspace{-10pt} % 可选：向下微调图片位置，减少图片下方的空白
+\end{wrapfigure}
+假设上底面边缘弧段 $C$ 与侧边直线段 $L$ 在像上同时可见，而下底面及侧边其余部分被遮挡。设 $P$ 为 $C$ 与 $L$ 的接口点，则可见边界在 $P$ 附近由上底面的凸弧 $C$与直线段 $L$相接，接口处曲率同样会发生跃迁，违背了几何性质。
+
+又由遮挡区域 $D$ 是一个凸集，其中任意两点连线段仍在 $D$内，又因为$L$作为可见边界，则$L$ 的端点皆在 $D$，可知整段 $L\subset D$，从而 $L$ 不可能在像上出现在可见域 $D^{c}$，与假设相违背。因此，在极限遮蔽下，目标的最后可见部分不可能同时包含上底面边缘与侧边直线段。
+% 假设圆柱体上底面边缘的弧段 $C$ 与侧边直线段 $L$ 在像上均可见，而下底面及侧边的另一部分均被球遮挡。设 $P$ 为 $C$ 与 $L$ 的接口点，则在像平面上可见边界处，轮廓由上底面的凸弧段 $C$ 与直线段 $L$ 相接，其中 $\kappa(C)>0$ 而 $\kappa(L)=0$。
+
+% 然而，根据平面曲线的曲率性质，若一条严格凸曲线段与一段直线段在开区间内相接，则在接点处曲率必然发生不连续突变，从而破坏边界的光滑性。另一方面，球的投影区域 $D$ 是严格凸集，其边界处处曲率大于零，因此 $D$ 的边界不可能在某点突变为一条直线。又由于 $P\in D^c$，而 $L$ 的端点属于 $D$，则由凸性的连通性可知 $\overline{PL}\subset D$，从而 $L$ 的可见部分不可能属于 $D^c$。这与假设相矛盾。因此，在极限遮蔽条件下，目标的最后可见部分不可能同时包含上底面边缘与侧边直线段。
+
+\vspace{1em}
+
+至此，我们证明了在极限遮蔽条件下，视线与遮蔽体相切的点，必然是圆柱体上、下底面边缘上的点，并将点集记为$\mathcal{S}_{\text{top}} \cup \mathcal{S}_{\text{bottom}}$。
+
+\subsubsection{有效遮蔽时长的判定}
+
+为了准确计算有效遮蔽时长，我们需要找到一个准确的判定依据，用于判断在某一时间段内，烟幕干扰弹弹产生的烟幕云团是否能有效遮蔽目标，从而阻断来袭导弹与真目标之间的视线。在任意时刻 t，如果该连线与烟雾云团的几何球体相交，则认为此刻遮蔽有效，有效遮蔽时长即为所有这些有效时刻的总和。下文我们阐释有效遮蔽的判定方法：
+
+连接导弹 $P_M(t)$ 与目标上任意一点 $P$ 的视线为一条直线。根据向量叉乘的几何意义，烟雾云团中心 $C_S(t)$ 到该视线直线的距离 $d(t, P)$ 为：
+\begin{equation}
+    d(t, P) = \frac{\lvert  \overrightarrow{P_M(t)P} \times \overrightarrow{P_M(t)C_S(t)} \rvert}{\lvert \overrightarrow{P_M(t)P} \rvert}
+\end{equation}
+
+其中，导弹位置为$P_M(t) = (x_M(t), y_M(t), z_M(t))$，烟雾云团中心$C_S(t)$ =( ($x_S(t)$, $y_S(t),$ $z_S(t)$)。
+
+将上式展开为坐标形式得：
+\begin{equation}
+    d(t, P) = \frac{\lvert (P - P_M(t)) \times (C_S(t) - P_M(t)) \rvert}{\lvert P - P_M(t) \rvert}
+\end{equation}
+
+在时刻 $t$，如果上述距离小于或等于烟雾云团半径 $R_S = 10$，则视线被遮蔽,遮蔽判定条件为：
+\begin{equation}
+    d(t, P) \le 10
+\end{equation}
+
+要使整个圆柱体目标被遮蔽，必须保证其上、下表面边缘上的所有点都满足遮蔽条件，这需要满足在所有点中计算出的距离 $d(t, P)$ 的最大值不大于10。因此，完整的目标被遮蔽的判定为：
+
+\begin{equation}
+    \max_{P \in \mathcal{S}_{top} \cup \mathcal{S}_{bottom}} \left( \frac{\lvert (P - P_M(t)) \times (C_S(t) - P_M(t)) \rvert}{\lvert P - P_M(t) \rvert} \right) \le 10,t \in [t''_1, t''_1 + 20]
+\end{equation}
+
+% 其中，时间$t$应处于烟幕干扰弹起爆时刻$t''_1$至烟幕消散时刻$t''_1+20$的20$s$区间内。
+
+若该不等式成立，则判定在时刻 $t$ 目标被完全有效遮蔽。需要特别注意的是，导弹穿出云团瞬间，导弹与圆柱体上点的连线与云团中心的距离也是小于10的，此时并不是相切的临界点，但此刻失去了烟雾云团的遮挡。在问题一的特殊位置下，出云位置，云团中心都位于XOZ平面上，并不会出现上述情况，后续模型需要考虑上述判定条件的适用范围。
+
+本问场景中还需要考虑遮蔽情况的连续性，即烟幕云团对导弹的遮蔽情况是按照“未开始遮蔽—开始遮蔽—导弹穿云—导弹穿出云团遮蔽结束”的顺序进行的，不会出现两段遮蔽时长。因此，对于问题一遮蔽时间计算，我们可以采取计算遮蔽开始、结束时间节点，进而计算时长。
+
+为便于计算有效遮蔽时长，我们将满足条件 (5-15) 的时间集合记为
+\begin{equation}
+\Omega = \Bigl\{\,t \in [t'',\,t''+20]\ \Big|\ 
+\max_{P\in \mathcal S_{\text{top}} \cup \mathcal S_{\text{bottom}}} d(t,P) \leq 10
+\Bigr\}.
+\end{equation}
+
+由于在问题一中，遮蔽过程只会出现一次连续的时间区间，因此遮蔽时段可以表示为一个闭区间：
+\begin{equation}
+\Omega = [T_0,\,T_1],
+\end{equation}
+
+设遮蔽开始时刻为$T_0$,遮蔽结束时刻为$T_1$,数值上等于集合 $\Omega$ 的下界和上界，则总遮蔽时长$T_\text{总}$为：
+\begin{equation}
+    T_\text{总}=T_1-T_0
+\end{equation}
+
+\subsubsection{静态有效遮蔽时长模型汇总}
+综上，本文最终建立的静态场景有效遮蔽时长计算模型为：
+% %--- 宽松版 ---
+% \begin{equation}
+%\label{eq:total_time}
+% \left\{
+% \begin{array}{l @{\quad} l}
+% %--- 烟幕云团运动轨迹 ---
+% \text{烟幕云团运动轨迹:} 
+%     & \begin{cases}
+%         P_1(t) = (17800 - v_{D1}t, 0, 1800) & 0 \le t \le 1.5 \\
+%         P_1(t) = \left(17800 - v_{D1}t, 0, 1800 - \frac{1}{2}g(t - t_{1}'')^2\right) & 1.5 \le t \le 5.1 \\
+%         P_1(t) = \left(17800 - v_{D1}t_{1}'', 0, 1800-6.48g-3t_1'''\right) & 5.1 \le t \le 25.1
+%     \end{cases}
+% \\[6ex] % 使用 \\[6ex] 增加组之间的垂直间距，使其更美观
+
+% %--- 导弹运动轨迹 ---
+% \text{导弹运动轨迹:} 
+%     & \begin{cases} 
+%         \vec{e}_1 = \frac{(20000,0,2000)}{|OM_1|} \\
+%         M_1(t) = (20000,0,2000) - 300\vec{e}_1 t
+%     \end{cases}
+% \\[6ex]
+
+% %--- 有效遮蔽判定 ---
+% \text{有效遮蔽判定:} 
+%     & \begin{cases}
+%         d(t, P) = \frac{\lvert \overrightarrow{P_M(t)P} \times \overrightarrow{P_M(t)C_S(t)} \rvert}{\lvert \overrightarrow{P_M(t)P} \rvert} \\
+%         d(t, P) \le 10 \\
+%         \max_{P \in \mathcal{S}_{top} \cup \mathcal{S}_{bottom}} \left( \frac{\lvert (P - P_M(t)) \times (C_S(t) - P_M(t)) \rvert}{\lvert P - P_M(t) \rvert} \right) \le 10, t \in [t''_1, t''_1 + 20]
+%     \end{cases} 
+% \\[6ex]
+
+% %--- 有效遮蔽时长 ---
+% \text{有效遮蔽时长:} 
+%     & T_\text{总} = T_1 - T_0
+% \end{array}
+% \right.
+% \end{equation}
+% %--- 紧凑版 ---
+\begin{equation}
+\label{eq:total_time}
+\left\{
+\begin{array}{l @{\quad} l}
+\text{云团轨迹:} 
+\begin{cases}
+P_1(t) = (17800\!-\!v_{D1}t,\; 0,\; 1800) & 0 \le t \le t_{1}' \\[0.3ex]
+P_1(t) = \bigl(17800\!-\!v_{D1}t,\; 0,\; 1800\!-\!\tfrac{1}{2}g(t\!-\!t_{1}'')^2\bigr) & t_{1}' \le t \le t_{1}'' \\[0.3ex]
+P_1(t) = \bigl(17800\!-\!v_{D1}t_{1}'',\; 0,\; 1800\!-\!\tfrac{1}{2}g(t_1''\!-\!t_1')^2\!-\!3(t\!-\!t_1'')\bigr) & t_{1}'' \le t \le t_{1}''+20
+\end{cases}
+
+\\[4ex]
+
+\text{导弹轨迹:} 
+        \begin{cases} 
+             \vec{e}_1 = \frac{(20000,0,2000)}{|OM_1|}\\
+             M_1(t) = (20000,0,2000) - 300\vec{e}_1 t
+        \end{cases}
+\\[4ex]
+
+\text{有效遮蔽判定:} 
+        \begin{cases}
+             d(t, P) = \frac{\lvert  \overrightarrow{P_M(t)P} \times \overrightarrow{P_M(t)C_S(t)} \rvert}{\lvert \overrightarrow{P_M(t)P} \rvert} \\
+            \max_{P \in \mathcal{S}_{top} \cup \mathcal{S}_{bottom}} \left(  d(t, P) \right) \le 10,\ \ t \in [t''_1, t''_1 + 20]
+        \end{cases} 
+\\[4ex]
+
+\text{遮蔽时间集合与时长:}
+        \begin{cases}
+        \displaystyle \Omega \;=\; \Bigl\{\, t \in [t''_1,\,t''_1+20] \ \Big| \ 
+        \max_{P\in \mathcal{S}_{top} \cup \mathcal{S}_{bottom}} d(t,P) \le 10 \Bigr\}\\[1ex]
+        \Omega \;=\; [T_0,\,T_1]\\[0.5ex]
+        \displaystyle T_{\text{总}} \;=\; T_1 - T_0
+        \end{cases}
+\end{array}
+\right.
+\end{equation}
+
+
+\subsection{问题一的模型求解}
+% \subsubsection{采样点个数的选取}
+% \begin{wrapfigure}{r}{0.45\textwidth} % 将图片放在右边，宽度为文本宽度的45%
+%     \vspace{-20pt} % 可选：向上微调图片位置，减少图片上方的空白
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{figures/遮挡时长随采样精度变化趋势.png} % 插入图片，宽度稍小于wrapfigure的宽度
+%     \caption{遮挡时长随采样精度变化趋势} % 图片标题
+%     \label{fig:obscuration_duration}
+%     \vspace{-20pt} % 可选：向下微调图片位置，减少图片下方的空白
+% \end{wrapfigure}
+% 基于\ref{sec:effective_shielding}中针对有效遮蔽的分析，判定烟幕有效遮挡的复杂几何模型即可被简化为从真目标上下圆周采样后，针对直线与球体相交的问题。理论上，圆柱上下圆周存在无数个采样点，但是考虑到模型求解的时间复杂度，本文采取均匀采样的方式来权衡求解精度和时间成本。若采样精度过低，容易导致遮挡情况的漏判，因此会使遮挡时长相对真实值偏高。因此本文枚举了一系列采样点依次进行求解，结果如右图所示:
+
+% 通过对采样点的相对收敛变化率进行分析可知，当采样点个数选取为100时，对应的遮挡时长达到最小值，且相对变化率始终为0。因此针对问题一，本文选择从上下圆周各均匀采样100个点的方式进行判定分析。考虑到问题一情景的特殊性，此后的采样精度必须大于本问精度。
+
+\subsubsection{采样精度的灵敏度分析}
+\label{subsubsec:sampling_analysis}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-10pt}
+    \centering
+    \includegraphics[width=0.48\textwidth]{figures/遮挡时长随采样精度变化趋势.png}
+    \caption{遮挡时长随采样精度变化趋势}
+    \label{fig:obscuration_duration}
+    \vspace{-10pt}
+\end{wrapfigure}
+
+基于\ref{sec:effective_shielding}中的分析，判定烟幕有效遮蔽的复杂几何模型即可被简化为从真目标上下圆周采样后，处理直线与球体相交的问题。理论上，圆柱上下圆周存在无数个采样点。但是考虑到模型求解的时间复杂度，本文采用离散化处理，从上下圆周均匀采样若干个点进行判定。
+
+理论上，采样点数量越多，对目标轮廓的描述越精确，计算结果也越逼近真实值。然而过多的采样点会显著增加计算负担，但若采样点过于稀疏，则可能出现“漏检”现象：即当目标的一小部分轮廓已经不再被遮蔽时，模型因未能捕捉到这一变化而错误地判定遮蔽仍在继续，从而导致计算出的有效遮蔽时长被高估。
+
+为了在计算精度和效率之间取得最佳平衡，我们对采样精度进行了灵敏度分析，结果如图 \ref{fig:obscuration_duration} 所示。
+从图中可以清晰地观察到，当采样点数从10增加到约50时，计算出的遮蔽时长出现了急剧下降，这验证了我们关于稀疏采样会导致结果高估的判断。当采样点数超过100后，遮蔽时长的计算结果迅速收敛并稳定在约 1.4006 秒。继续增加采样点数量对结果的提升微乎其微，但会徒增计算时间。
+
+综合考量，我们选择在上下圆周各均匀采样\textbf{100}个点的方式进行后续的判定分析。考虑到问题一情景的特殊性，此后的采样精度必须大于本问精度。
+
+\subsubsection{有效遮蔽时长计算} 
+\label{subsubsec:algorithm1}
+至此，本问求解所需的参数已确定。由于遮蔽状态判定函数的高度非线性，我们无法直接求得$T_{start}$ 和 $T_{end}$ 的解析解。因此，我们设计了“粗搜-精搜”的两阶段数值求解策略，其核心流程如图 \ref{fig:q1_algorithm_flowchart} 所示。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/问题一流程图.jpg}
+    \caption{问题一求解流程图}
+    \label{fig:q1_algorithm_flowchart}
+\end{figure}
+
+算法的具体步骤阐述如下：
+
+\textbf{Step1：} 
+将导弹、烟幕弹的空间位置描述为随时间$t$变化的向量函数$\vec{P}_M(t)$与$\vec{P}_S(t)$；
+
+\textbf{Step2：} 
+定义两种状态判定函数：遮蔽判定为在时刻 $t$，对所有预设的采样点 $\vec{P}_T$，均满足前文建立的有效遮蔽条件式 \eqref{eq:total_time}；导弹位于烟幕内判定为$||M_1(t) - C_S(t)|| \le R_s$。
+
+\textbf{Step3：} 
+对烟幕弹的有效时间窗口$T_{start} \sim T_{end}$，以$dt=0.1$为步长进行粗搜，得到遮蔽开始时间区间和导弹穿出烟幕时间区间；
+
+\textbf{Step4：} 
+对两个区间分别进行精度为$10^{-8}s$的二分法精搜，找到两种状态转换的精确时刻，进而得出有效遮蔽时长。
+
+\subsection{问题一的模型结果分析}
+根据\ref{subsubsec:algorithm1}中介绍的算法，我们通过数值计算得到了问题一中各个关键事件的精确发生时刻，其结果汇总于表 \ref{tab:q1_event_analysis}。
+
+\begin{table}[H]
+  \centering % 表格居中
+  \caption{关键遮蔽事件的时间节点与持续时长分析} % 表格标题
+  \label{tab:q1_event_analysis}
+  \begin{tabular}{
+    c % 第一列：左对齐的文本 (l for left)
+    S[table-format=1.8]
+    S[table-format=1.8]
+    S[table-format=1.8]
+  }
+    \toprule
+    {\textbf{事件}} & {\textbf{开始时刻 (s)}} & {\textbf{结束时刻 (s)}} & {\textbf{持续时长 (s)}} \\
+    \midrule
+    
+    % 数据行
+    目标完全遮蔽 & 8.04762214 & 9.44817719 & 1.40055505 \\
+    导弹穿越烟幕 & 9.38918427 & 9.44817719 & 0.05899292 \\
+    
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+最终，我们得出问题一的结论：在题目给定的条件下，烟幕干扰弹对导弹M1的有效遮蔽时长为 \textbf{1.40055505} 秒。
+
+\subsubsection{鲁棒性分析}
+\label{subsubsec:robustness_analysis}
+
+为检验问题一模型在关键假设被放宽时的可靠性，我们分别对烟幕云团的初始水平速度（无人机速度的10\%-20\%）和烟幕云团半径（在10m基础上浮动$\pm$10\%-20\%）进行了20次蒙特卡洛模拟。扰动结果如图\ref{fig:rob_speed}、\ref{fig:rob_radius}所示。
+
+% ==================== 双图 ====================
+\begin{figure}[H]
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/问题一速度扰动鲁棒性结果.png}
+        \caption{烟幕云团水平速度扰动结果}
+        \label{fig:rob_speed}
+    \end{minipage}
+    \hfill % 或者使用 \hspace{\fill}
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/问题一半径扰动鲁棒性结果.png}
+        \caption{烟幕云团半径扰动结果}
+        \label{fig:rob_radius}
+    \end{minipage}
+\end{figure}
+
+分析扰动结果分布，我们得出以下两个结论：
+
+\textbf{1.速度扰动影响显著：} 如图\ref{fig:rob_speed}所示，遮蔽时长对烟幕的初始水平速度高度敏感，最大变化率为 \(\mathbf{\pm71.07\%}\)。这是因为烟幕的时空位置直接影响其与高速导弹的几何交汇，微小的位置变化都会被高速运动放大。
+
+\textbf{2.半径扰动影响较小：} 如图\ref{fig:rob_radius}所示，遮蔽时长对烟幕的半径变化则表现出良好的稳定性，结果的标准差仅为\textbf{0.0770s}，最大变化率控制在 \(\mathbf{\pm6.85\%}\) 以内。这说明我们基准模型计算出的\textbf{1.40055505}秒，是一个可靠的参考值。
+
+综上所述，可认为我们前文求解的结果是较为准确且鲁棒的。分析同时表明，模型对影响时空位置的动态参数（速度）比对影响几何尺寸的静态参数（半径）更为敏感。
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section{问题二的模型的建立和求解}
+
+与问题一不同的是，问题二在不限制无人机的运动情况下求解最长遮蔽时间。我们可以对问题一中的模型进行改进，加入未知参数，进而转化为一个单目标优化模型，最后使用粒子群算法进行搜索最优参数。
+
+\subsection{单无人机单烟幕弹的动态遮蔽时长优化建模}
+% \begin{wrapfigure}{r}{0.45\textwidth} % 将图片放在右边，宽度为文本宽度的45%
+%     \vspace{-15pt} % 可选：向上微调图片位置，减少图片上方的空白
+%     \centering
+%     \includegraphics[width=0.4\textwidth]{figures/example.eps} % 插入图片，宽度稍小于wrapfigure的宽度
+%     \caption{基于问题一热力图分析示意} % 图片标题
+%     \label{fig:heatmap} % 图片标签，用于在正文中引用 \ref{fig:heatmap}
+%     \vspace{-10pt} % 可选：向下微调图片位置，减少图片下方的空白
+% \end{wrapfigure}
+
+% 对于入射光线被遮挡的情况，从目标函数（52）可知若最大化单位镜面面积年平均输出热功率，则阴影遮挡部分需尽可能取得最小值。从图13可以看出，问题一中阴影遮挡主要源自于距离集热器较远的定日镜。经过分析，本文发现问题一中的阴影遮挡主要源于集热器排布存在的缺陷。具体而言，在问题一中，集热器采用径向均匀排布方式，导致距离较远的定日镜反射角度较小，容易受到前方遮挡物的影响。此外，相邻定日镜底座中心之间的距离在问题一中存在较大空隙。问题一中定日镜排布方式有效减少了阴影遮挡面积，但大气透射率并非最优。本题运用径向交错分布的网格布局定日镜，该方法能够清楚地确定“预先排列”的角方位角间距应保持恒定，并要求在整个划分场的每个区域中，同一行的连续定日镜之间也应保持恒定。
+\subsubsection{决策变量约束}
+
+根据题意，本文决策变量为航向角、等高速度、投放与起爆时刻四个变量。令航向角为$\alpha$，取值范围为$[0^{\circ}, 360^{\circ})$,根据附件角度确立方式为以$x$轴正方向为零、逆时针方向为正；等高速度 \(v_D\)；题目要求确定干扰烟幕弹的投放点和起爆点坐标。为此，我们引入投放时刻 $t'$ 与起爆时刻 $t''$ 作为决策变量。在后续求解中，可通过已知的轨迹关系推算出对应的空间坐标。
+
+记单位航向向量为${\vec{e}}(\alpha)$，数学表达式为：
+\begin{equation}
+   {\vec{e}}(\alpha)=(\cos\alpha,\ \sin\alpha,\ 0)
+\end{equation}
+
+\vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{1} \textbf{时序和范围约束：}各事件发生有严格的时间顺序，且只有在烟幕云团未消散前才会有遮蔽效果，即时间需要满足范围约束：
+\begin{equation}
+    t'<t''
+\end{equation}
+\begin{equation}
+    t\in[t'',\,t''+20]
+\end{equation}
+
+\vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{2} \textbf{速度和航向角约束：}本题中规定无人机的速度必须控制在70到140$m/s$的范围内，因此有：
+\begin{equation}
+    v_D\in[70,140]
+\end{equation}
+\begin{equation}
+   \alpha\in [0^{\circ}, 360^{\circ})
+\end{equation}
+
+\subsubsection{状态方程}
+
+根据题意，导弹的运动轨迹方程仍同问题一，在此不再赘述。下面我们着重叙述问题二载弹无人机及烟幕云团的运动轨迹：
+
+\vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{1} \textbf{$0\le t<t' $} :此阶段无人机载弹飞行，烟幕干扰弹的运动轨迹同无人机：
+\begin{equation}
+    P_1(t)=P_1(0)+v_D\,t\,{\vec{e}}(\alpha)\\
+    =(17800+v_D\cos{\alpha}t,v_D\sin{\alpha}t,1800)
+\end{equation}
+
+\vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{2} \textbf{$t'\le t\le t'' $} :
+此阶段为无人机投放烟幕干扰弹到烟幕干扰弹爆炸这段时间内，我们研究烟幕干扰弹的运动轨迹，数学表达式为\upcite{doubao}：
+\begin{equation}
+\begin{split}
+     P_1(t) &= R+v_D\,(t-t')\,{\vec{e}}(\alpha)+\bigl(0,0,-\tfrac12 g\,(t-t')^2\bigr)\\
+          &=(17800+v_D\cos{\alpha}t,v_D\sin{\alpha}t,1800-\frac{1}{2}g(t-t')^2)\\
+\end{split}
+\end{equation}
+\begin{equation}
+    R=P_1(t')=P_1(0)+v_D\,t'\,{\vec{e}}(\alpha)
+\end{equation}
+
+其中，$R$是前一阶段结束时的坐标，也是平抛阶段的开始坐标,表示烟幕干扰弹投放点。
+
+\vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{3} \textbf{$t\in[t'',t''+20] $} :
+此阶段烟幕干扰弹完成爆炸，直到烟幕云团消散。设$B$表示该阶段开始时的坐标为烟幕干扰弹起爆时刻的坐标，起爆时刻为$t''$，其数学表达式为：
+\begin{equation}
+\begin{split}
+    B=P_1(t'')&=R+v_D\,(t''-t')\,{\vec{e}}(\alpha)+\bigl(0,0,-\tfrac12 g\,(t''-t')^2\bigr)\\
+    &=(17800+v_D\cos{\alpha}t'',v_D\sin{\alpha}t'',1800-\frac{1}{2}g(t''-t')^2)
+\end{split}
+\end{equation}
+
+烟幕云团的运动轨迹如下，其中$v_s=3\ \mathrm{m/s}$：
+\begin{equation}
+\begin{split}
+    C_S(t) &= B + (0, 0, -v_s(t - t'')) \\ 
+    = (17800 + v_D \cos \alpha t'',& v_D \sin \alpha t'', 1800 - \frac{1}{2}g(t'' - t')^2 - v_s(t - t''))
+\end{split}
+\end{equation}
+
+
+
+真目标为半径 \(r=7\ \mathrm{m}\)、高 \(h=10\ \mathrm{m}\) 的圆柱，底面圆心 \((0,200,0)\)。问题一中我们已经证明极限遮蔽情况下最后可见点位于上下底面边缘，表示为：
+\begin{equation}
+    \begin{cases}
+   \partial S_{\text{bottom}} = \{\{ (r \cos \theta, 200 + r \sin \theta, 0) : \theta \in [0, 2\pi) \}\} \\
+   \partial S_{\text{top}} = \{\{ (r \cos \theta, 200 + r \sin \theta, h) : \theta \in [0, 2\pi) \}\}
+\end{cases}
+\end{equation}
+\subsubsection{云团遮挡情况分析}
+
+% \begin{wrapfigure}{r}{0.45\textwidth}
+%     \vspace{-10pt}
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{figures/穿出云层遮挡情况.jpg}
+%     \caption{导弹穿出云层遮挡情况}
+%     \label{fig:obscuration_duration}
+%     \vspace{-30pt}
+% \end{wrapfigure}
+
+在问题一中，由于烟幕云团和导弹均在X-Z平面上运动，因此不用考虑导弹是否穿过云团以及导弹与云团的复杂位置关系，在本问中我们将一一探索。我们对一个任意的时刻$t_0$，首先需要判断导弹在该时刻前是否曾进入过云团，进而判断$t_0$时刻导弹与云团的位置关系，再决定选用什么样的判别条件来判别遮蔽情况。我们绘制出了分析过程的流程图，如下:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/实打实打算.pdf}
+    \caption{问题二遮蔽情况分析流程图}
+    \label{fig:placeholder}
+\end{figure}
+
+% 如上图所示，我们将所有可能的情况分为七种，根据其判定方法，我们再归为三大类：
+
+\vspace{0.5em} % 增加一点垂直间距
+% \circled{\large}{1} \textbf{向量判定法则：}
+
+% \begin{wrapfigure}{r}{0.45\textwidth}
+%     \vspace{-40pt}
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{figures/穿出云层遮挡情况.jpg}
+%     \caption{导弹穿出云层遮挡情况}
+%     \label{fig:obscuration_duration}
+%     \vspace{-10pt}
+% \end{wrapfigure}
+
+% 对于某时刻$t_0$，首先判断导弹在该时刻前是否进入过云团，判断方式为导弹与云团中心点的连线$R$是否等于10，如果曾经有过连线线段等于10的情况，证明曾经进入过云团或者与云团擦肩而过。我们进一步判断导弹此时此刻与云团的关系，若连线段$R$=10，则此时刻导弹刚好穿出云团，我们采用向量法来判定遮挡情况：设$t$时刻烟幕云团中心为$C_S(t)$,导弹所在点为$P_M(t)$，圆柱体上下表面任意边缘点为$P(t)$,则导弹与云团中心点连线的向量与导弹与边缘点连线的向量相乘数量积为：
+% \begin{equation}
+% \begin{split}
+%      \Psi(t) &=\overrightarrow{P_MC_S}\cdot\overrightarrow{P_MP}\\
+%           &= \bigl(C_S(t) - P_M(t)\bigr) \cdot \bigl(P(t) - P_M(t)\bigr)
+% \end{split}
+% \end{equation}
+
+ % 如图所示，若 $\Psi(t) < 0$,则两向量成钝角，则穿出云层时没有遮挡；若 $\Psi(t) = 0$，则两向量呈直角，此时两条线相切，处于临界点；若 $\Psi(t) > 0$，则两向量呈锐角，此时导弹穿出云层时仍有遮挡，当导弹继续飞行到导弹与目标边界连线正好与烟幕云团相切时，导弹才不被遮挡。进而我们可以计算更加精确的有效遮蔽时长。
+
+ \vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{1} \textbf{垂距判定法则：}
+
+垂距判定法则已经不能够满足一些特殊情况的判定，例如在导弹位于云团中心与目标点连线之间时，垂距可能大于10但此时不会被遮蔽。因此我们需要寻找更完备的判定法则，同时将垂距判定法作为辅助来判断遮蔽情况。垂距判定法的判定公式见问题一，在此不再赘述。
+
+ \vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{2} \textbf{是否穿云判定：}
+
+为了更清晰描述云团对导弹的遮蔽情况，对某时刻$t$，我们需要判断导弹在该时刻前是否进入过云团。定义导弹与云团中心点的连线段长度为$R(t)=\bigl\lvert\overrightarrow{P_M(t)C_S(t)} \bigr\rvert$，判断方式为$R$是否曾小于等于10，为了清晰的表示，我们引入指示函数：
+\begin{equation}
+\operatorname Y(t)=
+\begin{cases}
+    1& \text{if\quad}\exists t_0<t,R(t_0)\le10 \\[1.5ex]
+    0& \text{else  }
+\end{cases}
+\end{equation}
+
+如果曾经有过时刻$t_0$，满足导弹与云团中心连线长度小于等于10的情况，证明曾经进入过云团或者与云团擦肩而过。如果曾经没有过$R\le 10$的情况，则导弹没有穿入过烟幕云团。
+% 我们进一步判断导弹此时此刻与云团的关系，若连线段$R$=10，则此时刻导弹刚好穿出云团。
+
+\newpage
+ \vspace{0.5em} % 增加一点垂直间距
+\circled{\large}{3} \textbf{投影判定法则：}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-20pt}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/穿出云层遮挡情况.jpg}
+    \caption{投影法判断示意图}
+    \label{fig:obscuration_duration}
+    \vspace{-5pt}
+\end{wrapfigure}
+
+对于某些特殊情况，单纯地依靠垂距判定可能会失效，这时需要引入更准确的方法-投影判定准则。如图，仍设$t$时刻烟幕云团中心为$C_S(t)$,导弹所在点为$P_M(t)$，圆柱体上下表面任意边缘点为$P(t)$，导弹指向烟幕云团中心的向量为$\overrightarrow{P_MC_S}$,导弹指向目标边缘点的向量为$\overrightarrow{P_MP}$，根据几何原理，当烟幕云团中心点在三维空间中位于导弹与目标之间时，才有可能发生遮挡，转化为数学语言，我们利用向量$\overrightarrow{P_MC_S}$在向量$\overrightarrow{P_MP}$上的投影范围之间来判断。首先我们令向量投影为$\sigma_t$，定义为：
+\begin{equation}
+    \sigma_t=\frac{\overrightarrow{P_MC_S}\cdot\overrightarrow{P_MP}}{\lvert \overrightarrow{P_MP} \rvert }
+\end{equation}
+
+接着，我们引入视线段归一化投影系数，定义为该向量投影$\sigma_t$与向量$\overrightarrow{P_MP}$的模比值为：
+\begin{equation}
+    \varepsilon(t)=\frac{\overrightarrow{P_MC_S}\cdot\overrightarrow{P_MP}}{\lvert \overrightarrow{P_MP} \rvert ^2}
+\end{equation}
+
+
+遮挡情况下该比值范围应限制在$(0,1]$范围内，如图所示，若 $ \varepsilon\leq 0$或$ \varepsilon>1$时,导弹与目标点位于云团同侧，此情况下真目标不会被遮挡；若 $ \varepsilon = 0$，则两向量呈直角，此时两条线相切，处于临界点，此处规定临界点处于恰好看见状态；若 $ \varepsilon\in[0,1]$，则两向量呈锐角，此时导弹的遮挡情况需要结合垂距判定法来判断，若导弹到云团与目标点连线所在直线的垂距$d_{(t,P)} < 10$,则导弹视线被遮挡，当导弹继续飞行到导弹与目标边界连线正好与烟幕云团相切时，导弹才不被遮挡;若垂距$d_{(t,P)} \ge 10$,则导弹视线没有被遮挡。进而我们可以计算更加精确的有效遮蔽时长。
+
+经过整理归类，我们绘制出以下包含十种情况的表格\upcite{kimi}:
+
+\begin{table}[H]
+    \centering
+    \caption{所有遮挡情况分类}
+    \label{tab:grid_thick_border_fixed}
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \noalign{\hrule height 1.2pt}
+        \textbf{情况} & \textbf{是否穿云} & \textbf{导弹与云心距离} & \textbf{投影系数} & \textbf{遮挡情况} & \textbf{情况说明} \\
+        \hline
+        1 & 否 & $R=10$ & $\varepsilon \in (0,1]$  & 遮挡 & \multirow{2}{*}{导弹穿入云团或与其相切} \\
+        \cline{1-5}
+        2 & 否 & $R=10$ & $\varepsilon \le 0 ,\varepsilon>1$  & 未遮挡 & \\
+        \hline
+        3 & 否 & $R>10$ & $\varepsilon \in (0,1]$  & 遮挡 ($d \le r$) 未遮挡 ($d > r$) & \multirow{2}{*}{导弹未进入云团} \\
+        \cline{1-5}
+        4 & 否 & $R>10$ & $\varepsilon \le 0$ & 未遮挡 & \\
+        \hline
+        5 & 否 & $R<10$ & /                  & 遮挡 & 受步长精度影响，恰进入云团 \\
+        \hline
+        6 & 是 & $R=10$ & $\varepsilon \le 0 ,\varepsilon>1$  & 未遮挡 & \multirow{2}{*}{导弹恰穿出云团} \\
+        \cline{1-5}
+        7 & 是 & $R=10$ & $\varepsilon \in (0,1]$  & 遮挡 & \\
+        \hline
+        8 & 是 & $R<10$ & /                  & 遮挡 & 导弹在云团内 \\
+        \hline
+        9 & 是 & $R>10$ & $\varepsilon \in (0,1]$  & 遮挡 & \multirow{2}{*}{导弹已穿出云团} \\
+        \cline{1-5}
+        10& 是 & $R>10$ & $\varepsilon \le 0 ,\varepsilon>1$ & 未遮挡 & \\
+        \noalign{\hrule height 1.2pt}
+    \end{tabular}
+\end{table}
+
+为便于后续计算，我们依据表格中的判别规则建立二值指示函数，并表达成抽象函数$f$的形式：
+\begin{equation}
+    Y'(t)=f(Y(t),R(t),\varepsilon(t),d(t))
+\end{equation}
+本文约定1为遮挡，0为未遮挡，有：
+\begin{equation}
+    Y'(t)=\begin{cases}
+    1& \text{遮挡}\\[1.5ex]
+    0& \text{未遮挡}
+\end{cases}
+\end{equation}
+
+
+% 在问题一中，由于烟幕云团和导弹均在X-Z平面上运动，因此不用考虑导弹穿出云团时的复杂判定情况，此问中导弹穿出云团时刻需要考虑导弹与目标边缘点连线与球的位置关系，进而分析导弹穿出云团时是否被遮蔽。根据数学几何知识，我们可以转化为向量的关系来求解。首先引入指示函数：
+% \begin{equation}
+% \operatorname Y'=
+% \begin{cases}
+%     1& \text{if 导弹穿云} \\[1.5ex]
+%     0& \text{if 导弹不穿云 }
+% \end{cases}
+% \end{equation}
+
+% 对于导弹穿云的情况，我们运用\textbf{向量乘法}来进一步判别遮挡情况：
+
+% 设$t$时刻烟幕云团中心为$C_S(t)$,导弹所在点为$P_M(t)$，圆柱体上下表面任意边缘点为$P(t)$,则导弹与云团中心点连线的向量与导弹与边缘点连线的向量相乘数量积为：
+% \begin{equation}
+%      \Psi(t) = \bigl(C_S(t) - P_M(t)\bigr) \cdot \bigl(P(t) - P_M(t)\bigr)
+% \end{equation}
+
+%  如图所示，若 $\Psi(t) < 0$,则两向量成钝角，则穿出云层时没有遮挡；若 $\Psi(t) = 0$，则两向量呈直角，此时两条线相切，处于临界点；若 $\Psi(t) > 0$，则两向量呈锐角，此时导弹穿出云层时仍有遮挡，当导弹继续飞行到导弹与目标边界连线正好与烟幕云团相切时，导弹才不被遮挡。进而我们可以计算更加精确的有效遮蔽时长。
+
+
+\subsubsection{有效遮蔽时长计算}
+
+
+% 该部分分为两种情况：若导弹不穿过云团，则导弹与目标边缘点连线与云团第二次相切的时刻$t^*$即为结束遮蔽时刻；若导弹穿过云团,只有在两向量夹角为锐角时，结束穿云后导弹仍有一段遮蔽时长，此时需考虑遮蔽结束时刻的点的计算。
+
+
+% \begin{equation}
+% \operatorname T_1=
+% \begin{cases}
+%     1& \text{遮挡}\\[1.5ex]
+%     0& \text{未遮挡 }
+% \end{cases}
+% \end{equation}
+
+我们定义遮蔽时间区间集合，有：
+\begin{equation}
+\Omega = \{t|Y'(t)=1\}
+\end{equation}
+
+其中， $Y'(t)$ 表示在时刻 $t$ 的遮蔽状态，当 $Y'(t) = 1$ 时，表示真目标被遮蔽。
+% 该指示模型表示，当导弹穿云并且出云团后瞬时导弹与目标边缘点连线与烟幕云团向量夹角为锐角时，结束遮蔽时刻取连线第二次相切的时刻；当导弹不穿过云团或者导弹穿过云团但穿云之后连线与云团向量夹角为钝角或直角时，结束遮蔽时刻取导弹点与云团中心到目标点连线所在直线的垂距第二次为10的时刻。这样我们就完整地建立了有效遮蔽时长的计算模型。
+% \begin{equation}
+%     \Omega(\alpha,v_D,t',t'')=
+% \Bigl\{\,t\in[t'',\,t''+20]\ \Big|\ 
+% \max_{P\in\partial\mathcal S_{\text{top}}\cup\partial\mathcal S_{\text{bottom}}} d(t,P)\le 10
+% \Bigr\}
+% \end{equation}
+
+% 有效遮蔽时长为该集合的测度：
+% \begin{equation}
+%     T_{\mathrm{eff}}(\alpha,v_D,t',t'')=\int_{\Omega(\alpha,v_D,t',t'')} dt\ =\ \mathrm{meas}\!\left(\Omega(\alpha,v_D,t',t'')\right)
+% \end{equation}
+% 由于在问题二中，遮蔽过程只会出现一次连续的时间区间，因此c可以表示为一个闭区间：
+通过上文中遮蔽情况连续性分析，与问题一类似，本小问遮蔽过程同样具有连续性。因而，我们可以计算遮蔽收尾时刻之差，得到更加精确的有效遮蔽时长。定义真目标开始被遮蔽的时刻为$T_0$,遮蔽结束的时刻为$T_1$，则有：
+\begin{equation}
+\Omega = [T_0,\,T_1]
+\end{equation}
+
+故总遮蔽时长$T_\text{总}$为：
+\begin{equation}
+    T_\text{总}=T_1-T_0
+\end{equation}
+
+\subsubsection{目标函数}
+
+依题意，目标函数定义为最大化被遮蔽时长总和：
+
+\begin{equation}
+    \textit{max}\ \ T_{\text{总}} 
+\end{equation}
+
+\subsubsection{问题二模型总结}
+
+总遮蔽时长优化模型为：
+
+\begin{equation*}
+    \textit{max}\ \ T_{\text{总}} 
+\end{equation*}
+
+
+\begin{equation}
+\text{s.t.}
+\label{eq:model_2}
+\left\{
+\begin{array}{l @{\quad} l}
+\text{决策变量:} 
+\left\{
+\begin{aligned}
+& \alpha\in[0^{\circ}, 360^{\circ})\\
+& v_D\in[70,140]\\
+& 0\le t'\le t''\\
+& 0\le t\le t''+20
+\end{aligned}
+\right.
+\\[4ex] 
+
+\text{导弹轨迹:} 
+\begin{cases} 
+\vec{e}_1 = \dfrac{(20000,0,2000)}{|OM_1|}\\[0.5ex]
+M_1(t) = (20000,0,2000) - 300\,\vec{e}_1\, t
+\end{cases}
+\\[4ex]
+
+% \text{云团轨迹:} 
+% \begin{cases}
+% P_1(t) = (17800\!+\!v_D\cos\alpha\,t,\; v_D\sin\alpha\,t,\; 1800) & 0 \le t < t' \\[0.3ex]
+% P_1(t) = (17800\!+\!v_D\cos\alpha\,t,\; v_D\sin\alpha\,t,\; 1800\!-\!\tfrac{1}{2}g(t\!-\!t')^2) & t' \le t \le t'' \\[0.3ex]
+% P_1(t) = (17800\!+\!v_D\cos\alpha\,t'',\; v_D\sin\alpha\,t'',\; 1800\!-\!\tfrac{1}{2}g(t''\!-\!t')^2\!-\!v_s(t\!-\!t'')) & t'' \le t \le t'' + 20
+% \end{cases}
+% \\[4ex]
+\text{云团轨迹:} 
+\begin{cases}
+P_1(t) = (17800\!+\!v_D\cos\alpha\,t,\; v_D\sin\alpha\,t,\; 1800) & 0 \le t < t' \\[0.3ex]
+P_1(t) = (17800\!+\!v_D\cos\alpha\,t,\; v_D\sin\alpha\,t,\; 1800\!-\!\tfrac{1}{2}g(t\!-\!t')^2) & t' \le t \le t'' \\[0.3ex]
+P_1(t) = 
+\begin{aligned}[t]
+&(17800\!+\!v_D\cos\alpha\,t'',\; v_D\sin\alpha\,t'',\; \\
+&\quad 1800\!-\!\tfrac{1}{2}g(t''\!-\!t')^2\!-\!v_s(t\!-\!t''))
+\end{aligned} & t'' \le t \le t'' + 20
+\end{cases}
+\\[4ex]
+
+% \text{云团轨迹:} 
+% \begin{cases}
+% P_1(t)=\bigl(17800+v_D\cos{\alpha}\,t,\ \ v_D\sin{\alpha}\,t,\ \ 1800\bigr) & 0\le t<t' \\[0.3ex]
+% P_1(t)=\bigl(17800+v_D\cos{\alpha}\,t,\ \ v_D\sin{\alpha}\,t,\ \ 1800-\tfrac{1}{2}g(t-t')^2\bigr) & t'\le t\le t''\\[0.3ex]
+% P_1(t)=\bigl(17800+v_D\cos{\alpha}\,t'',\ \ v_D\sin{\alpha}\,t'',\ \ 1800-\tfrac{1}{2}g(t''-t')^2- v_s(t - t'')\bigr) & t''\le t\le t''+20
+% \end{cases}
+% \\[4ex]
+
+\text{有效遮蔽判定:} 
+\begin{cases}
+    \begin{cases}
+   \partial S_{\text{bottom}} = \{\{ (r \cos \theta, 200 + r \sin \theta, 0) : \theta \in [0, 2\pi) \}\} \\
+   \partial S_{\text{top}} = \{\{ (r \cos \theta, 200 + r \sin \theta, h) : \theta \in [0, 2\pi) \}\}
+   \end{cases}\\
+
+d(t, P) = \dfrac{\bigl\lvert  \overrightarrow{P_M(t)P} \times \overrightarrow{P_M(t)C_S(t)} \bigr\rvert}{\bigl\lvert \overrightarrow{P_M(t)P} \bigr\rvert} \\[1.0ex]
+
+\displaystyle \max_{P \in \mathcal{S}_{\text{top}} \cup \mathcal{S}_{\text{bottom}}} 
+d(t,P)\le 10,\ \ t \in [t'',\, t'' + 20]\\
+R(t)=\bigl\lvert\overrightarrow{P_M(t)C_S(t)}\bigr\rvert \\
+Y(t)=\begin{cases}
+    1& \text{if\quad}\exists t_0<t,R(t_0)\le10 \\[1.5ex]
+    0& \text{else  }
+\end{cases}\\
+\varepsilon (t)=\frac{\overrightarrow{P_MC_S}\cdot\overrightarrow{P_MP}}{\lvert \overrightarrow{P_MP} \rvert ^2}\\
+Y'(t)=\begin{cases}
+    1& \text{遮挡\quad}\\[1.5ex]
+    0& \text{未遮挡 }
+\end{cases}=f(Y(t),R(t),\varepsilon(t),d(t))\\
+\end{cases}
+\\[4ex]
+
+\text{有效遮蔽时长计算:}
+\begin{cases}
+\Omega = \{t|Y'(t)=1\}\\
+\Omega = [T_0,\,T_1]\\[1.2ex]
+\  T_\text{总}=T_1-T_0
+\end{cases}
+\end{array}
+\right.
+\end{equation}
+
+% \text{有效遮蔽时长计算:}
+% \begin{cases}
+% \displaystyle \Omega(\alpha,v_D,t',t'')=\Bigl\{\,t \in [t'',\,t''+20]\ \Big|\ 
+% \max_{P\in \partial\mathcal S_{\text{top}} \cup \partial\mathcal S_{\text{bottom}}} d(t,P) \le 10 \Bigr\},\\[1.2ex]
+% \displaystyle T_{\mathrm{eff}}(\alpha,v_D,t',t'')=\int_{\Omega(\alpha,v_D,t',t'')} \! dt\ =\ \mathrm{meas}\!\left(\Omega(\alpha,v_D,t',t'')\right)
+% \end{cases}
+% \end{array}
+% \right.
+% \end{equation}
+
+
+
+\subsection{问题二的模型求解}
+
+基于题设，式\ref{eq:model_2}中模型仅对$t'$和$t''$进行了时间序列上的先后约束，而并未设置可行的数值上界。为避免求解中在不可行域进行过多的无效搜索，本节基于题设背景和已知参数，对$t'$和$t''$的数值上界进行合理地约束。
+
+\subsubsection{约束条件的修正}
+已知导弹M1从 $(20000, 0, 2000)$ 以 $300 \, \text{m/s}$ 飞向 $(0, 0, 0)$，则到达假目标所需时间为：
+\begin{equation}
+    t_{\text{m}} = \frac{\lvert(20000, 0, 2000)\rvert}{300} \approx 66.7 \text{ s}
+\end{equation}
+
+根据经验，更优的投放策略通常满足烟幕云团在导弹击中前消散，因此起爆时刻至少在导弹击中前20s，有以下约束：
+\begin{equation}
+   t' \le t'' \le  t_{\text{m}} -20= 46.7 \text{ s}
+\end{equation}
+
+进一步，烟幕干扰弹投放点至起爆点的垂直位移为$\Delta z = \frac{1}{2} g (t'' - t')^2$。
+若时间差$t'' - t'$ 过大，将导致烟幕弹在地面起爆。我们取起爆最低高度为$0\text{m}$，可反解出起爆时间：
+\begin{equation}
+    t'' - t' \le \sqrt{\frac{2\times1800}{g}} \approx 19.2 \text{ s}
+\end{equation}
+
+由此可知，烟幕弹飞行时长最大不超过19.2s，水平速度范围\( 70 \sim 140 \),因此烟幕弹最远只能飞到
+\begin{equation}
+L_{\max} = 140 \times 19.2 \approx 2688 \text{ m}
+\end{equation}
+显然，烟幕弹不可能真正飞到目标位置附近。因此若在地面起爆，其对于高空导弹的遮蔽将完全失效。因此有：
+\begin{equation}
+    t'' \le t' + 19.2
+\end{equation}
+
+\subsubsection{基于改进粒子群算法的模型求解}
+\textbf{(一) 算法流程伪代码}
+
+该优化问题属于四维连续优化问题，由于存在复杂的约束条件，传统数值方法难以进行解析求解。鉴于此，本文引入因此本文使用启发式算法——粒子群算法对其进行求解。具体算法流程如下所示：
+
+\begin{algorithm}[H]
+\caption{基于改进粒子群算法的投放策略优化}
+\label{alg:pso_for_problem2}
+\begin{algorithmic}[1]
+    \Require 最大迭代数 $T_{max}$，群体规模 $N$，决策变量边界 $\mathbf{Bounds}$
+    \Ensure 最优投放策略向量 $\mathbf{G}_{best} = (\alpha^*, v_D^*, t'^*, t''^*)$
+    
+    \Statex // 1. 初始化
+    \State $\mathbf{Pop}^{(0)}, \mathbf{v}^{(0)} \leftarrow$ \textsc{InitializePopulation}$(N, \mathbf{Bounds})$ // 随机初始化种群位置与速度
+    \State $\mathbf{P}_{best} \leftarrow \mathbf{Pop}^{(0)}$ // 初始化个体历史最优位置
+    \State $\mathbf{G}_{best} \leftarrow \arg\max_{\mathbf{x} \in \mathbf{Pop}^{(0)}} f(\mathbf{x})$ // 初始化全局历史最优位置（最大遮蔽时长）
+    
+    \Statex // 2. 迭代搜索
+    \For{$t = 0 \to T_{max}-1$} // 开始迭代
+        \For{$i = 1 \to N$} // 遍历每个粒子，即一个投放策略方案 $\mathbf{x}_i = (\alpha_i, v_{D,i}, t'_i, t''_i)$
+            \State $w(t) \leftarrow w_{max} - (w_{max} - w_{min}) \cdot (t/T_{max})$ // 采用线性递减惯性权重
+            \State $r_1, r_2 \sim U(0, 1)$ // 生成(0,1)之间的随机数
+            \State $\mathbf{v}_i^{(t+1)} \leftarrow w(t)\mathbf{v}_i^{(t)} + c_1 r_1(\mathbf{P}_{best,i} - \mathbf{x}_i^{(t)}) + c_2 r_2(\mathbf{G}_{best} - \mathbf{x}_i^{(t)})$
+
+            \State $\mathbf{x}_i^{(t+1)} \leftarrow \mathbf{x}_i^{(t)} + \mathbf{v}_i^{(t+1)}$
+            \State $\mathbf{x}_i^{(t+1)} \leftarrow$ \textsc{ConstraintHandle}$(\mathbf{x}_i^{(t+1)})$ // 对不满足约束条件采用罚函数法
+            \State \parbox[t]{\dimexpr\linewidth-4em}{% 宽度计算以适应行号和缩进
+                $f_{new} \leftarrow$ \textsc{CalculateGradedFitness}$(\mathbf{x}_i^{(t+1)})$ // 用梯度化适应度函数评估策略优劣 \strut
+                \textit{// 若$f_{new} > 0$，其值为实际遮蔽时长；否则为引导性的“接近度”负分}\strut}
+            \If{$f_{new} > f(\mathbf{P}_{best,i})$} // 更新个体最优策略
+                \State $\mathbf{P}_{best,i} \leftarrow \mathbf{x}_i^{(t+1)}$
+                \If{$f(\mathbf{P}_{best,i}) > f(\mathbf{G}_{best})$} // 更新全局最优
+                    \State $\mathbf{G}_{best} \leftarrow \mathbf{P}_{best,i}$
+                \EndIf
+            \EndIf
+        \EndFor
+    \EndFor
+    
+    \Statex // 3. 返回结果
+    \State \Return $\mathbf{G}_{best}$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{(二) 算法改进策略}
+
+\vspace{1em}
+
+\circled{\large}{1} \textbf{梯度化适应度函数设计}
+
+传统粒子群优化算法在处理具有稀疏可行域的复杂优化问题时，常因目标函数缺乏梯度信息而陷入无效搜索。本文针对烟幕遮蔽时长优化这一特殊问题，设计了分层梯度化适应度函数，为粒子提供有效的搜索方向。
+
+改进的梯度化适应度函数构造为：
+
+$$f'(\boldsymbol{x}) = \begin{cases}
+T_{\text{总}}(\boldsymbol{x}) & \text{if } T_{\text{总}}(\boldsymbol{x}) > 0 \\
+-1 + 0.95 \cdot S_{\text{prox}}(\boldsymbol{x}) & \text{if } T_{\text{总}}(\boldsymbol{x}) = 0
+\end{cases}$$
+
+其中接近度评价函数$S_{\text{prox}}(\boldsymbol{x}) \in [0,1]$定义为：
+$$S_{\text{proximity}}(\boldsymbol{x}) = \max_{t \in \mathcal{T}} \left[ w_1 S_d(t) + w_2 S_p(t) + w_3 S_t(t) \right]$$
+
+式中：$\mathcal{T}$为关键时刻集合；$S_d(t)$为导弹-烟幕距离接近度；$S_p(t)$为导弹-目标连线与烟幕的几何关系评价；$S_t(t)$为时间窗口合理性评价；权重系数$w_1 = 0.4, w_2 = 0.4, w_3 = 0.2$；$R$为烟幕有效半径。
+
+\vspace{1em}
+\circled{\large}{2} \textbf{约束处理与边界修复策略}
+
+考虑到烟幕遮蔽问题的物理约束特性，本文针对时间约束$t' \leq t''$和时间差约束$(t'' - t') \leq 19.2$，采用如下修复策略：
+
+对于粒子$\boldsymbol{x}_i = (\alpha_i, v_{D,i}, t'_i, t''_i)$，约束修复过程为：
+
+\textbf{Step1：} 若$t'_i > t''_i$，则交换$t'_i$与$t''_i$；
+
+\textbf{Step2：} 若$(t''_i - t'_i) > 19.2$，则调整$t''_i = t'_i + 19.2$；
+
+\textbf{Step3：} $t''_i = \min(\max(t''_i, t''_{\min}), t''_{\max})$。
+
+该策略确保所有粒子始终位于可行域内，避免了罚函数法可能导致的搜索效率降低。
+
+\vspace{1em}
+\circled{\large}{3} \textbf{超参数优化}
+
+本文对粒子群的超参数进行合理优化，以有效防止种群过早收敛至局部最优解。
+
+\textbf{惯性权重}：采用线性递减策略以平衡全局探索与局部开发：
+$$w(k) = w_{\max} - \frac{w_{\max} - w_{\min}}{k_{\max}} \cdot k$$
+
+其中$w_{\max} = 0.9$，$w_{\min} = 0.4$，$k$为当前迭代次数，$k_{\max}$为最大迭代次数。
+
+\textbf{学习因子}：针对烟幕遮蔽问题存在多个局部最优解的特点，采用提高认知因子、降低社会因子的策略：
+$$c_1 = 2.8, \quad c_2 = 1.3$$
+通过$c_1 > c_2$的参数配置，鼓励种群在不同的参数空间区域并行探索，提高发现全局最优解的概率。
+
+\textbf{解的规模}：
+经过多轮调试，本文设置粒子数为200，迭代轮数为100，以平衡搜索性能和计算成本。
+
+\subsection{结果的求解及合理性分析}
+综上所述，本文求解得到问题二模型的最优参数以及最大遮蔽时长，如下表所示：
+\begin{table}[H]
+    \centering
+    \caption{最优参数与最大遮蔽时长}
+    \label{tab:optimal_results_final_layout}
+    \begin{tabular}{ll@{\qquad}ll}
+        \toprule
+        \textbf{参数项} & \textbf{最优值} & \textbf{参数项} & \textbf{最优值} \\
+        \midrule
+        航向角 ($\alpha$) & $6.67^\circ$ & 无人机速度 ($v_D$) & $137.53~\mathrm{m/s}$ \\
+         投放时刻($t'$) & $0.066~\mathrm{s}$     & 起爆时刻 ($t''$) & $0.772~\mathrm{s}$ \\
+        投放点坐标(m) & (17809.02, 1.06, 1800.00) & 起爆点坐标(m) & (17905.45, 12.34, 1797.56) \\
+        \midrule
+        最大遮蔽时长 & & & \textbf{4.587695 s} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+结果显示，无人机FY1的飞行方向为与X轴正方向逆时针成\textbf{$6.67^\circ$}，飞行速度为\textbf{137.53$m/s$}，投放时刻为0.066$s$，投放点坐标为\textbf{$(17809.02, 1.06, 1800.00)$}，起爆时刻0.772$s$，起爆点坐标为\textbf{$(17905.45, 12.34, 1797.56)$}，总最大遮蔽时长为\textbf{4.587695$s$}。
+
+该结果具有一定合理性：为避免导弹接近目标而减小拦截时间，无人机在受领任务后极短时间内朝向导弹方向飞行，几乎同时投下烟幕干扰弹，且飞行速度非常接近题目允许的最大速度，能够为后续遮蔽真目标争取时间，符合客观事实，说明本模型具有客观实际性。
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{问题三的模型的建立和求解}
+
+问题三在问题二的基础上，将单枚干扰弹的优化问题扩展为3枚干扰弹的协同优化问题。这三枚烟幕弹不再是独立优化的，它们的投放时机、引爆时机、以及形成的烟幕云团在时空上的关系，共同决定了最终的总遮蔽效果。下面我们基于问题二的模型，改进模型使其适用于问题三场景。
+\subsection{单无人机多烟幕弹的动态遮蔽时长优化建模}
+\subsubsection{多云团遮挡判定模型}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-10pt}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/问题三多云团遮挡情况分析.jpg}
+    \caption{协同遮挡示意图}
+    \label{fig:obscuration_duration}
+    \vspace{-10pt}
+\end{wrapfigure}
+
+
+与单个云团的判定情况不同，对于空间中同一时间可能存在多个云团的场景。由于实际的遮挡效果可能是三个云团共同实现的，如图\ref{fig:obscuration_duration}所示。因此，仅对单一云团进行遮挡判定是不完善的，问题二中建立的遮挡判定模型不再完全适用。此时我们将进行遮挡判定的对象由云团转变为目标圆柱体。
+
+由图可知，目标点选取为圆柱上下底面边缘情况不再适用，为此我们建立了新的
+目标取点方式：圆柱体的上表面、侧面上的所有点，以及下表面的所有边缘点构成取点集合$D$。其原因是下底面与地面接触，不会被导弹探测到。
+
+接着，我们制定了新的遮挡判定规则：对于$D$上的任意一点，需要对当前时刻存在的所有云团逐个进行问题二中的遮挡判定步骤。只要存在一个云团，例如无人机$j$释放的第$i$个烟幕干扰弹，能够实现对该点的遮挡，则该情况就被判定为成功遮挡。只有当圆柱表面上采样的所有点均满足遮挡判定时，才能确定该时刻下整个目标圆柱被判定为遮挡，采取判定公式如下：
+\begin{equation}
+    \label{Yjip}
+    Y_{j,i}^p(t)=\begin{cases}
+    1& \text{if\quad}\text{$t$时刻该点P被无人机$j$投出的云团$i$遮蔽} \\[1.5ex]
+    0& \text{else  }
+\end{cases}
+\end{equation}
+\begin{equation}
+    Y^p(t)=\begin{cases}
+    1& \text{if\quad}\exists (i,j) ,Y_{j,i}^p(t)=1\\[1.5ex]
+    0& \text{else  }
+    \end{cases}
+\end{equation}
+
+
+
+对目标圆柱体上任意一点$P$,我们分析该点在整个过程中的被遮挡情况：
+
+首先需要判断导弹与云团的位置关系：当$R(t)<10$时，导弹在云团内部，此时P点一定被遮蔽；当$R(t)\ge10$时，导弹在云团边界上或云团外部，此时需要进一步判断导弹到云团中心与P点连线所在直线的距离以及投影系数的范围。同问题二，我们将所有6种情况绘制成表\ref{tab:multi_cloud_classification}进行展示：
+\begin{table}[H]
+  \centering
+  \caption{多云团遮挡情况分类}
+  \label{tab:multi_cloud_classification}
+  \begin{tabular}{|c|c|c|c|c|}
+  \noalign{\hrule height 1.2pt}
+    情况 & 导弹与云心距离 & 投影系数 & 垂距范围 & 遮挡情况 \\ \hline
+    1 & $R < 10$ & / & / & 遮挡 \\ \hline
+    2 & \multirow{2}{*}{$R = 10$} & $\varepsilon \le 0,\varepsilon >1$ & \multirow{2}{*}{/} & 不遮挡 \\ \cline{1-1} 
+    3 &                           & $\varepsilon \in (0,1]$   &                    & 遮挡 \\ \hline
+    4 & \multirow{3}{*}{$R > 10$} & \multirow{2}{*}{$\varepsilon \in (0,1]$}   & $d \ge 10$ & 不遮挡 \\ \cline{1-1} 
+    5 &                           &                     & $d < 10$   & 遮挡 \\ \cline{1-1} \cline{3-5}
+    6 &      & $\varepsilon \le 0,\varepsilon >1$ & /    & 不遮挡 \\
+        \noalign{\hrule height 1.2pt}
+  \end{tabular}
+\end{table}
+
+
+与问题二相似，我们结合表格判定准则，把式(\ref{Yjip})表达成抽象函数形式：
+\begin{equation}
+ Y^p_{j,i}(t)=\begin{cases}
+    1& \text{遮挡}\\[1.5ex]
+    0& \text{未遮挡}
+\end{cases}=g\!\bigl(R_i(t),\varepsilon_i(t),d_i(t,P)\bigr)\end{equation}
+
+至此，我们可以求得目标圆柱体被完全遮蔽的总时长，即满足所有目标点 $p \in D$ 同时被遮蔽的时间$t$集合，数学表达式为：
+\begin{equation}
+    \Omega =\left\{ t\middle| \forall p\in D,Y^{p}=1 \right\}
+\end{equation}
+
+
+\vspace{-2em}
+\subsubsection{决策变量约束}
+
+问题三的烟幕干扰弹数量增加到3个,整个策略由以下 $ 8$ 个决策变量共同决定：无人机飞行速度$v_D$，航向角$\alpha$，三枚烟幕干扰弹各自投放与引爆时刻：$t'_i$，$t''_i~(i=1,2,3)$，
+且满足 $t''_i - t'_i > 0$，前两个决策变量约束条件不变。
+\begin{equation}
+t''_i - t'_i > 0, \quad i = 1, 2, 3
+\end{equation}
+
+题中指出每一架无人机投放烟幕弹的时间间隔至少为1$s$，有：
+\begin{equation}
+t'_2 - t'_1 \ge 1
+\end{equation}
+\begin{equation}
+t'_3 - t'_2 \ge 1
+\end{equation}
+
+\vspace{-2em}
+\subsubsection{状态方程}
+
+状态方程描述了场景中各个物体随时间 $t$ 的位置,用坐标 ${P}(t)$ 表示,下文我们将在问题二基础上改进模型，求得导弹、烟幕弹及烟幕云团的新的轨迹方程。导弹轨迹方程不变，故此处不再赘述。仅叙述烟幕弹系统轨迹方程:
+
+% \textbf{(一)导弹 M1 轨迹方程}
+
+% 同问题一,导弹从初始位置 ${P}_M(0) = (20000, 0, 2000)$ 以 $v_M=300$ m/s 的速度飞向原点,其单位方向向量为:
+% \begin{equation}
+%     \vec{e}_1 =\frac{{P}_M(0)}{{P}_M(0)}
+% \end{equation}
+
+% 导弹轨迹方程为:
+% \begin{equation}
+%     M_1(t) = (20000,0,2000) - 300\vec{e}_1 t
+% \end{equation}
+
+记无人机FY1的坐标为${P}_{1}(t)$,该无人机从初始位置 ${P}_{1}(0) = (17800, 0, 1800)$ 以速度 $v_D$ 和航向 $\alpha$ 做匀速直线运动。其单位航向向量为 $\vec{e}(\alpha) = (\cos \alpha, \sin \alpha, 0)$，则无人机轨迹为：
+\begin{equation}
+    {P}_{1}(t) = {P}_{1}(0) + v_D t \vec{e}(\alpha)=(17800+\cos{\alpha}v_Dt,\sin{\alpha}v_Dt,1800)
+\end{equation}
+
+我们将载弹飞行阶段的无人机、平抛阶段的烟幕干扰弹和匀速下落阶段的烟幕云团看作一个烟幕弹系统，分阶段研究该系统轨迹路线。设第 $i$ 枚烟幕干扰弹系统中心的位置为 ${P}_{S,i}(t)$($i=1, 2, 3$),其运动轨迹分三个阶段:
+\begin{equation}
+\begin{split}
+{P}_{S,i}(t) &= 
+\begin{cases}
+    {P}_{1}(t) &  0 \le t \le t'_i \\
+    {P}_{1}(t'_i) + v_D (t - t'_i) \vec{e}(\alpha) - (0, 0, \frac{1}{2}g(t - t'_i)^2) & t'_i < t \le t''_i \\
+    {C}_{S,i}(t) &  t''_i < t \le t''_i + 20
+\end{cases}\\
+&=\begin{cases}
+(17800\!+\!\cos{\alpha}v_Dt,\; \sin{\alpha}v_Dt,\; 1800) & 0 \le t \le t'_i \\[0.3ex]
+(17800\!+\!\cos{\alpha}v_Dt,\; \sin{\alpha}v_Dt,\; 1800\!+\!\tfrac{1}{2}g(t\!-\!t_i')^2) & t'_i < t \le t''_i \\[0.3ex]
+(17800\!+\!v_D\cos{\alpha}t_i'',\; v_D\sin{\alpha}t_i'',\; 1800\!-\!\tfrac{1}{2}g(t_i''\!-\!t_i')^2\!-\!v_s(t\!-\!t_i'')) & t''_i < t \le t''_i + 20
+\end{cases}
+\end{split}
+\end{equation}
+
+其中，${C}_{S,i}(t)$ 是第 $i$ 个烟幕云团中心的位置，由引爆点位置减去下沉位移得到。
+
+至此，我们在问题二基础上得到了一个无人机可用，可投放多枚烟幕弹情境下各主体的轨迹方程，为后续优化提供依据。
+% \begin{equation}
+%      {C}_{S,i}(t)=(17800+v_D\cos{\alpha}t_i'',v_D\sin{\alpha}t_i'',1800-\frac{1}{2}g(t_i''-t_i')^2)
+% \end{equation}
+
+% \textbf{(二)有效遮蔽判定}
+
+% 在时刻 $t$，对于第 $i$ 个激活的烟幕云团（中心为 ${C}_{S,i}(t)$，半径 $R_s = 10$m），若其能完全遮蔽真目标，则导弹 ${P}_M(t)$ 与目标上下表面轮廓点 ${P}$ 的连线的距离都必须小于等于云团半径$R_s$,数学表达式为:
+% \begin{equation}
+%     d_i(t, P) = \frac{\lvert  \overrightarrow{P_M(t)P} \times \overrightarrow{P_M(t){C}_{S,i}(t)} \rvert}{\lvert \overrightarrow{P_M(t)P} \rvert}\le 10
+% \end{equation}
+
+% 同样地,本问中由于没有规定无人机运动方向和速度,会出现穿出云团之后仍被遮蔽的情况,可以沿用问题二中所建向量判定模型。
+\vspace{-0.5em}
+\subsubsection{目标函数}
+
+我们的目标是使总有效遮蔽时间最长。本问及后续小问中，遮蔽时间不再满足连续性。因此总遮蔽时间不再表现为连续区间，而是一个离散或不连续的时间集合。基于此，则目标函数可表示为时间集合的测度最大化，又因为上文得总有效遮蔽时间$\Omega =\left\{ t\middle| \forall p\in D,Y^{p}=1 \right\}$,可得目标函数\upcite{deepseek}：
+
+\begin{equation}
+     \textit{max} \quad T_{\text{总}} = \operatorname{m}(\Omega)
+\end{equation}
+
+
+\vspace{-0.5em}
+\subsubsection{问题三模型汇总}
+
+综上,问题三模型在问题二基础上略作修改，并作如下补充:
+
+\begin{equation*}
+     \textit{max} \quad T_{\text{总}} = \operatorname{m}(\Omega)
+\end{equation*}
+% 模型汇总
+\begin{equation*}
+\text{s.t.}
+\label{eq:model3_summary}
+\left\{
+\begin{array}{l @{\quad} l}
+\text{补充约束条件:} 
+\left\{
+\begin{aligned}
+% &\alpha\in[0^{\circ},360^{\circ}),\qquad v_D\in[70,140],\\
+&0\le t'_i\le t''_i,\quad i=1,2,3,\\
+&t'_2 - t'_1 \ge 1,\quad t'_3 - t'_2 \ge 1
+\end{aligned}
+\right.
+\\[4ex]
+
+
+\text{多云团有效遮蔽:} 
+\begin{cases}
+d_i(t, P) = \dfrac{\bigl\lvert  \overrightarrow{P_M(t)P} \times \overrightarrow{P_M(t)C_{S,i}(t)} \bigr\rvert}{\bigl\lvert \overrightarrow{P_M(t)P} \bigr\rvert}\le 10,\ \ t \in [t''_i,\, t''_i + 20] \\[1.0ex]
+R_i(t)=\bigl\lvert\overrightarrow{P_M(t)C_{S,i}(t)}\bigr\rvert \\
+\varepsilon_i (t)=\dfrac{\overrightarrow{P_M(t)C_{S,i}(t)}\cdot\overrightarrow{P_M(t)P}}{\lvert \overrightarrow{P_M(t)P} \rvert ^2}\\
+ Y^p_{j,i}(t)=\begin{cases}
+    1& \text{遮挡}\\[1.5ex]
+    0& \text{未遮挡}
+\end{cases}=g~\!\bigl(R_i(t),\varepsilon_i(t),d_i(t,P)\bigr)\\
+   Y^p(t)=\begin{cases}
+    1& \text{if\quad}\exists (i,j) ,Y_{j,i}^p(t)=1,j=1,i=1,2,3\\[1.5ex]
+    0& \text{else  }
+    \end{cases}\\
+\end{cases}
+\\[4ex]
+
+\text{遮蔽时间:}
+\left\{
+\begin{aligned}
+&    \Omega =\left\{ t\middle| \forall p\in D,Y^{p}=1 \right\}\\[0.4ex]
+&   T_{\text{总}} = \operatorname{m}(\Omega)
+\end{aligned}
+\right.
+\end{array}
+\right.
+\end{equation*}
+
+% % ==================== 2x3 子图 ====================
+% \begin{figure}[H] % 使用 [H] 确保图片出现在此处, [htbp] 提供了更多浮动灵活性
+%     \centering % 将整个图片组居中
+
+%     % --- 第一行图片 ---
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figures/example.eps}
+%         \caption{筛选后年平均截断效率热图}
+%         \label{fig:sub_a}
+%     \end{subfigure}
+%     \hspace{\fill} % 在子图之间添加弹性水平空白
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figures/example.eps}
+%         \caption{筛选后年平均输出热功率}
+%         \label{fig:sub_b}
+%     \end{subfigure}
+%     \hspace{\fill} % 在子图之间添加弹性水平空白
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figures/example.eps}
+%         \caption{筛选后年平均阴影遮挡效率热图}
+%         \label{fig:sub_c}
+%     \end{subfigure}
+
+%     \vspace{5mm} % 在两行图片之间添加一些垂直间距
+
+%     % --- 第二行图片 ---
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figures/example.eps}
+%         \caption{筛选后年平均余弦效率热图}
+%         \label{fig:sub_d}
+%     \end{subfigure}
+%     \hspace{\fill} % 在子图之间添加弹性水平空白
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figures/example.eps}
+%         \caption{筛选后年平均大气透射率}
+%         \label{fig:sub_e}
+%     \end{subfigure}
+%     \hspace{\fill} % 在子图之间添加弹性水平空白
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figures/example.eps}
+%         \caption{筛选后年平均光学效率热图}
+%         \label{fig:sub_f}
+%     \end{subfigure}
+
+%     \caption{问题二镜场年均性能参数热力图} % 这是整个图片组的总标题
+%     \label{fig:heatmap_grid} % 这是整个图片组的标签
+% \end{figure}
+% ==================== 2x3 子图代码结束 ====================
+
+\vspace{-0.5em}
+\subsection{问题三的模型求解}
+\vspace{-0.5em}
+\subsubsection{算法设计}
+由于问题三存在多云遮挡情况，本文在问题二粒子群算法基础上进行了如下优化：
+
+\textbf{1.采样方式：}
+考虑到圆柱上除了底面外的任一点都可能暴露，因此本文对圆柱侧面进行$theta_{step}=24$、$z_{step}=10$、对圆柱上圆面进行$theta_{step}=24$、$r_{step}=4$的定步长采样，共计$240+73=313$个采样点
+
+\textbf{2.向量化运算：}
+问题三的搜索空间相比问题二更加复杂，为提高运算效率，本文采用向量化计算策略对核心函数进行优化。
+通过将原有的嵌套循环结构转换为矩阵运算，将时间复杂度从$O(N)$降至$O(1)$。
+
+\textbf{3. 变步长搜索：}
+为进一步降低搜索的时间复杂度，本文设计了变步长计算策略，在保证计算结果精度的前提下，避免了计算测度的高昂时间成本。具体步骤如下：
+
+\textbf{Step1：} 设定时间步长$\varepsilon = 0.05$s，将连续时间域$[t_{\text{start}}, t_{\text{end}}]$离散化为检查点序列$\{t_i = t_{\text{start}} + i \cdot \varepsilon\}_{i=0}^{N}$，其中$N = \lfloor(t_{\text{end}} - t_{\text{start}})/\varepsilon\rfloor$。对每个检查点$t_i$，计算其遮蔽状态$S(t_i) \in \{0,1\}$，生成遮蔽状态掩码序列$\mathbf{M} = [S(t_1), S(t_2), \ldots, S(t_N)]$。
+
+\textbf{Step2：} 基于粗搜结果识别遮蔽状态转换点，设$\{j_k\}$为状态跳变的索引集合，即$S(t_{j_k}) \neq S(t_{j_k+1})$。对每个跳变区间$[t_{j_k}, t_{j_k+1}]$，采用二分法求解精确边界。
+
+\vspace{-0.5em}
+\subsubsection{求解结果}
+
+问题三基于上述算法求解得到如下结果：
+\vspace{-0.5em}
+\begin{table}[H]
+  \centering
+  \caption{无人机投放烟幕干扰弹策略}
+  \label{tab:uav_strategy}
+  \begin{tabular}{cccccc}
+    \toprule
+    编号&无人机运动方向 & 速度 (m/s)  & 投放点坐标 & 起爆点坐标 & 有效干扰时长 (s) \\
+    \midrule
+   1 &$ 8.32^\circ$ & 110.4204 &  (17800,0,1800) & (17800.13,0.02,1800) & 2.5625 \\
+   2 & $8.32^\circ$ & 110.4204  &  (17909.26,15.98,1800) & (17909.39,15.99,1800) & 3.9234 \\
+   3& $8.32^\circ$ & 110.4204 &  (18076.66,40.45,1800) & (18211.95,60.23,1792.48) & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\vspace{-1em}
+\subsection{问题三的求解结果分析}
+将上述结果可视化后得到：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/烟幕弹投放策略时空分析.png}
+    \caption{烟幕弹投放策略时空分析}
+    \label{fig:placeholder}
+\end{figure}
+
+求解结果显示，烟幕干扰弹1的有效干扰时长为2.5625$s$，烟幕干扰弹2的有效干扰时长为3.9234$s$，两烟幕弹的投放与起爆几乎同时发生；而烟幕干扰弹3的起爆与投放之间相隔很长时间，有效干扰时长为0。两时间段具有重叠，总有效干扰时长为\textbf{6.4031$s$}。
+\vspace{-2em}
+\subsection{误差分析}
+
+本问中误差主要源于圆柱表面离散采样与数值积分步长：我们选取的313个点虽覆盖上下底及侧面，但仍可能漏检微小裸露弧段，从而导致遮蔽时长被高估；变步长二分搜索以0.05 s为初值，对云团边界切换时刻存在$±0.01 $s截断误差，在6.4 s总时长中相对影响约0.3\%。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\vspace{-0.5em}
+\section{问题四的模型的建立和求解}
+
+问题四在问题二的基础上，将1架无人机优化问题拓展为3架无人机的协同优化问题。我们在问题二、三模型基础上，改进模型使其适用于问题四场景。
+\subsection{多无人机单烟幕弹的动态遮蔽时长优化建模}
+\subsubsection{决策变量约束}
+
+问题四的无人机数量增加到3架,我们将其编号记为$j~(j=1,2,3)$。本问共有 $ 12$ 个决策变量：无人机$j$飞行速度$v_{D,j}$，航向角$\alpha_j$，无人机$j$投下的烟幕干扰弹$i~(i=1)$各自投放与引爆时刻：$t'_{j,1}$，$t''_{j,1}$，于是有约束条件：
+\begin{equation}
+    t'_{j,1}\le t''_{j,1},\quad  j=1,2,3
+\end{equation}
+
+\vspace{-2em}
+\subsubsection{状态方程}
+导弹轨迹同前三问，不再重复赘述；对于云团轨迹，加入无人机编号$j$后，我们更新如下：\\
+\begin{equation}
+\begin{split}
+{P}_{j}(t)& = 
+\begin{cases}
+    P_{j}(0)+v_Dt\vec{e}(\alpha_j) & 0 \le t \le t'_{j,1} \\
+    {P}_{j}(t'_{j,1}) + v_D (t - t'_{j,1}) \vec{e}(\alpha) - (0, 0, \frac{1}{2}g(t - t'_{j,1})^2) &t'_{j,1} < t \le t''_{j,1} \\
+    {P}_{j}(t''_{j,1})-(0,0,v_s(t-t_{j,i}'')) &  t''_{j,1} < t \le t''_{j,1} + 20
+\end{cases}\\
+&=\begin{cases}
+\bigl(P_{j}(0)_x\!+\!v_{D,j}\cos{\alpha_j}t,\; P_{j}(0)_y\!+\!v_{D,j}\sin{\alpha_j}t,\; P_{j}(0)_z\bigr) & \\[0.3ex]
+\bigl(P_{j}(0)_x\!+\!v_{D,j}\cos{\alpha_j}t,\; P_{j}(0)_y\!+\!v_{D,j}\sin{\alpha_j}t,\; P_{j}(0)_z\!-\!\tfrac{1}{2}g(t\!-\!t'_{j,1})^2\bigr) & \\[0.3ex]
+\bigl(P_{j}(0)_x\!+\!v_{D,j}\cos{\alpha_j}t'',\; P_{j}(0)_y\!+\!v_{D,j}\sin{\alpha_j}t'',\; P_{j}(0)_z\!-\!\tfrac{1}{2}g(t''_{j,1}\!-\!t'_{j,1})^2\!-\!v_s(t\!-\!t_i'')\bigr) &
+\end{cases}
+\end{split}
+\end{equation}
+
+\vspace{-2em}
+\subsubsection{有效遮蔽时间}
+有效遮蔽判定模型类同问题三，此处不再赘述。对于有效遮蔽时间模型，我们修正$i,j$下标范围，如下：
+\begin{equation}
+Y^p(t)=\begin{cases}
+    1& \text{if\quad}\exists (i,j) ,Y_{j,i}^p(t)=1\qquad i=1,j=1,2,3\\[1.5ex]
+    0& \text{else  }
+    \end{cases}\\
+\end{equation}
+最终,求遮蔽时间范围公式如下：
+\begin{equation}
+\left\{
+\begin{aligned}
+&\Omega =\left\{ t\middle| \forall p\in D,Y^{p}=1 \right\}\quad \\[0.6ex]
+& T_{\text{总}}=m(\Omega)
+\end{aligned}
+\right.
+\end{equation}
+
+\subsection{问题四的模型求解与结果分析}
+相较于前述问题，问题四决策变量的维度增大至12维，导致解空间稀疏。先前所采用的粒子群算法极易过早地收敛到某个局部最优解，难以进行充分的全局探索。
+因此，本文选用搜索能力更强的混合进化算法。通过引入多个子种群并行搜索、融合差分进化与遗传算法的寻优机制，能够更好地进行全局探索。具体的算法流程设计如下：
+
+\begin{algorithm}[H]
+\caption{基于混合进化算法的三架无人机协同投放策略优化}
+\label{alg:hybrid_evolution_problem4}
+\begin{algorithmic}[1]
+    \Require 最大代数 $G_{max}$，种群规模 $N$，子种群数 $K$
+    \Ensure 最优协同策略 $\mathbf{G}_{best} = (\alpha_1^*, v_{D,1}^*, t'_1^*, t''_1^*, \alpha_2^*, v_{D,2}^*, t'_2^*, t''_2^*, \alpha_3^*, v_{D,3}^*, t'_3^*, t''_3^*)$
+    
+    \Statex // 1. 针对FY1、FY2、FY3的协同烟幕投放策略初始化
+    \State 采用多种策略初始化$K$个子种群，模拟不同无人机编队的投放方案组合
+    \State $\mathbf{G}_{best} \leftarrow \arg\max_{\mathbf{x}} f(\mathbf{x})$ // 寻找对导弹M1遮蔽效果最佳的策略
+    
+    \Statex // 2. 进化优化寻找最佳烟幕干扰弹投放时机和位置
+    \For{$g = 0 \to G_{max}-1$} // 迭代寻优过程，逐步改善三机协同遮蔽效果
+        \For{$k = 1 \to K$} // 对每个无人机编队方案进行优化
+            \If{$\text{rand}() < P_{DE}(g)$} // 根据当前优化效果选择进化策略
+                \State $\mathbf{Pop}_k^{(g+1)} \leftarrow$ 差分进化优化各机投放参数和起爆时机
+            \Else
+                \State $\mathbf{Pop}_k^{(g+1)} \leftarrow$ 基于锦标赛选择优化无人机飞行轨迹和投弹策略
+            \EndIf
+            \State 保留遮蔽效果最佳方案，局部微调投放位置提升烟幕云团覆盖效果
+        \EndFor
+        \State 子编队间交换优秀投放策略，更新全局最优三机协同遮蔽方案
+    \EndFor
+    \State \Return $\mathbf{G}_{best}$ // 输出最优的三架无人机烟幕干扰弹协同投放策略
+\end{algorithmic}
+\end{algorithm}
+% 搜索结果如下表所示：
+
+基于上述算法求解得到3架无人机投放烟幕弹策略如下：
+\begin{table}[H]
+  \centering
+  \caption{三无人机协同投放烟幕干扰弹最优策略}
+  \label{tab:q3}
+  \begin{tabular}{cccccc}
+    \toprule
+    无人机
+    & 运动方向$^\circ$
+    & 速度
+    & \centering 投放点坐标\,/\,m
+    & \centering 起爆点坐标\,/\,m
+    & 有效干扰时长\,/\,s \\
+    \midrule
+    FY1 & 9.05   & 70.87 & (17800,\,0,\,1800) & (17874.41,\,11.85,\,1794.46) & 4.5817 \\
+    FY2 & 258.16 & 104.23 & (11854.74,\,706.9,\,1800) & (11714.71,\,258.16,\,1189.64) & 3.7094 \\
+    FY3 & 99.17  & 126.37 & (5604.32,\,5499.83,\,1800) & (548.76,\,700,\,567.98) & 2.8429 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+结果显示，三架无人机的运动方向分别为9.05$^\circ$，258.16$^\circ$，99.17$^\circ$，运动速度分别为70.87$m/s$，104.23$m/s$，126.37$m/s$，总最大有效干扰时长为\textbf{11.134009秒}。
+
+我们对上表方案中详细时空情况可视化，如下：\\
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/无人机协同干扰与导弹轨迹时空可视化.jpg}
+    \caption{无人机协同干扰与导弹轨迹时空可视化}
+    \label{fig:placeholder}
+\end{figure}
+
+从图中可以看出，三架无人机接到指令时，其大致轨迹均朝着导弹轨迹靠近，即无人机提前到达与导弹可能相交的轨迹点，投放烟幕干扰弹，使得总遮蔽时长最大，符合实际场景，说明该结果具有一定合理性。
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{问题五的模型的建立和求解}
+问题五在前四小问的基础上，情景全面升级为5架无人机，各投放3枚烟幕干扰弹，来完成对3枚导弹的干扰遮蔽的复杂优化模型。
+\vspace{-1em}
+\subsection{多机–多弹–多导场景下的动态遮蔽时长优化建模}
+\subsubsection{决策变量约束}
+对编号进行整理，无人机编号为$j~(j=1,2,3,4,5)$，其各自携带导弹编号为$i~(i=1,2,3)$，遮蔽无人机编号$k,(k=1,2,3)$，共有40个决策变量。我们逐一归纳约束条件如下：
+\begin{equation}
+    \begin{cases}
+\alpha_j \in [0^{\circ},\,360^{\circ}) \\
+v_{D,j} \in [70,\,140] \\
+0 \le t'_{j,i} \le t''_{j,i},\qquad j=1,\dots,5,\ \ i=1,2,3. \\
+t'_{j,i+1} - t'_{j,i} \ge 1\ \mathrm{s},\qquad j=1,\dots,5,\ \ i=1,2.
+\end{cases}
+\end{equation}
+
+% \begin{equation}
+% \text{云团仅在 } \ [\,t''_{j,i},\ t''_{j,i}+20\,]\ \text{内生效},\qquad j=1,\dots,5,\ \ i=1,2,3.
+% \end{equation}
+\vspace{-1em}
+\subsubsection{导弹轨迹}
+
+记导弹$k~(k=1,2,3)$在$t$时刻的位置为$P_{M,k}(t)$，将导弹轨迹模型拓展至一般情况，有：
+\begin{equation}
+\vec{e}_k = \frac{\overrightarrow{OP_{M,k}(0)}}{\left\lvert \overrightarrow{OP_{M,k}(0)} \right\rvert}
+\end{equation}
+\begin{equation}
+P_{M,k}(t) = P_{M,k}(0) - 300\,\vec{e}_{k}\, t
+\end{equation}
+
+\vspace{-1em}
+\subsubsection{烟幕弹系统轨迹}
+类比问题三，无人机$j~(j=1,...,5)$抛下的烟幕弹$i~(i=1,2,3)$的轨迹如下所示：
+\begin{equation}
+\begin{aligned}
+P_{j,i}(t) &= 
+\begin{cases}
+P_{j}(0) + v_D t\, \vec{e}(\alpha_j) & 0 \le t \le t'_{j,i} \\
+P_{j}(t'_{j,i}) + v_D (t - t'_{j,i})\, \vec{e}(\alpha_j) - (0, 0, \tfrac{1}{2}g(t - t'_{j,i})^2) & t'_{j,i} < t \le t''_{j,i} \\
+P_{j}(t''_{j,i}) - (0, 0, v_s(t - t''_{j,i})) & t''_{j,i} < t \le t''_{j,i} + 20
+\end{cases}
+\\[2ex]
+&= 
+\begin{cases}
+\bigl(P_{j}(0)_x + v_{D,j} \cos{\alpha_j} t,\; P_{j}(0)_y + v_{D,j} \sin{\alpha_j} t,\; P_{j}(0)_z\bigr) & \\[0.3ex]
+\bigl(P_{j}(0)_x\!+\!v_{D,j} \cos{\alpha_j} t,\; P_{j}(0)_y\!+\!v_{D,j} \sin{\alpha_j} t,\; P_{j}(0)_z\!-\!\tfrac{1}{2}g(t\!-\!t'_{j,i})^2\bigr) & \\[0.3ex]
+\bigl(P_{j}(0)_x\!+\!v_{D,j} \cos{\alpha_j} t'',\; P_{j}(0)_y\!+\!v_{D,j} \sin{\alpha_j} t'',\; P_{j}(0)_z\!-\!\tfrac{1}{2}g(t''_{j,i}\!-\!t'_{j,i})^2\!-\!v_s(t\!-\!t_i'')\bigr) &
+\end{cases}
+\end{aligned}
+\end{equation}
+\vspace{-1em}
+\subsubsection{有效遮蔽分析}
+
+% 在问题五中，考虑存在多枚导弹的情形。由于多个云团可能在不同时间段内对不同导弹产生遮蔽效果，因此可能出现如下情形：某一时间段内，某些导弹的视线被遮挡，而另一些导弹则未被遮挡。
+
+问题五中有多枚导弹，可能会出现多个云团对其中某些导弹形成有效遮蔽，而对另一些导弹不形成有效遮蔽的情况。根据题意，只有当三枚导弹看向目标圆柱的视线全部被遮挡时才能算有效遮蔽。由问题四，单枚导弹$k$有效遮蔽时长为$m(\Omega_k)$,其中$\Omega_k =\left\{ t\middle| \forall p\in D,Y^{p}=1 \right\}$。故，本问中有效遮蔽时长为三枚导弹各自遮蔽时间集合的交集的测度，记作：
+
+\begin{equation}
+    T_\text{总}=m(\bigcap_{k=1}^3 \Omega_{k})=m\bigcap_{k=1}^3 \left\{ t\middle| \forall p\in D,Y^{p}_{k}=1 \right\}
+\end{equation}
+
+\vspace{-1em}
+\subsubsection{目标函数}
+本小问的目标为最大化真目标在未被任意一枚导弹观测到的总时间长度，即三枚导弹同时无法观测到目标的时间区间的测度：
+\begin{equation}
+    \textit{max}\quad T_{\text{总}} = m(\bigcap_{k=1}^3 \Omega_{k})
+\end{equation}
+
+\newpage
+\vspace{-1em}
+\subsubsection{最终模型汇总}
+\vspace{-1em}
+\[
+    \textit{max}\quad T_{\text{总}} = m(\bigcap_{k=1}^3 \Omega_{k})
+\]
+
+\begin{equation*}
+\text{s.t.}
+\label{eq:model5_summary}
+\left\{
+\begin{array}{l @{\quad} l}
+
+\text{决策变量约束:}
+\left\{
+\begin{aligned}
+& \alpha_j \in [0^{\circ},\,360^{\circ})\\[0.3ex]
+& v_{D,j} \in [70,\,140]\\[0.3ex]
+& 0 \le t'_{j,i} \le t''_{j,i},\qquad j=1\dots,5,\ \ i=1,2,3\\[0.3ex]
+& t'_{j,i+1} - t'_{j,i} \ge 1\ \mathrm{s}\qquad j=1,\dots,5,\ \ i=1,2
+\end{aligned}
+\right.
+\\[4ex]
+
+% \text{导弹轨迹:}
+% \begin{cases} 
+% \vec{e}_{k} = \dfrac{P_{M,k}(0)-O}{\lvert P_{M,k}-O\rvert}\\[0.6ex]
+% P_{M,k}(t) = P_{M,k}(0) - 300\,\vec{e}_{k}\, t
+% \end{cases}
+% \\[4ex]
+
+% \text{烟幕弹系统轨迹:}
+% \begin{cases}
+% P_{j,i}(t)=\bigl(P_{j}(0)_x+v_{D,j}\cos{\alpha_{j}}\,t,\ \ P_{j}(0)_y+v_{D,j}\sin{\alpha_j}\,t,\ \ P_{j}(0)_z\bigr) & 0\le t<t'_{j,i} \\[0.3ex]
+% P_{j,i}(t)=\bigl(P_{j}(0)_x+v_{D,j}\cos{\alpha_j}\,t,\ \ P_{j}(0)_y+v_{D,j}\sin{\alpha_j}\,t,\ \ P_{j}(0)_z-\tfrac{1}{2}g(t-t'_{j,i})^2\bigr) & t'_{j,i}\le t\le t''_{j,i}\\[0.3ex]
+% P_{j,i}(t)=\bigl(P_{j}(0)_x+v_{D,j}\cos{\alpha_j}\,t''_{j,i},\ \ P_{j}(0)_y+v_{D,j}\sin{\alpha_j}\,t''_{j,i},\ \ P_{j}(0)_z-\tfrac{1}{2}g(t''-t'_{j,i})^2\bigr)-v_s(t-t''_{j,i}) & t''_{j,i}\le t\le t''_{j,i}+20
+% \end{cases}
+% \\[4ex]
+
+\text{有效遮蔽分析:}
+\begin{cases}
+d_{j,i,k}(t,P) = \dfrac{\bigl\lvert  \overrightarrow{P_{M,k}(t)P} \times \overrightarrow{P_{M,k}(t)C_{S,j,i}(t)} \bigr\rvert}{\bigl\lvert \overrightarrow{P_{M,k}(t)P} \bigr\rvert}\le 10,\ \ t \in [t''_{j,i},\, t'' _{j,i}+ 20] \\[1.0ex]
+
+R_{j,i,k}(t)=\bigl\lvert\overrightarrow{P_{M,k}(t)C_{S,j,i}(t)}\bigr\rvert \\[0.8ex]
+
+\varepsilon _{j,i,k}(t)=\dfrac{\overrightarrow{P_{M,k}(t)C_{S,j,i}(t)}\cdot\overrightarrow{P_{M,k}(t)P}}{\lvert \overrightarrow{P_{M,k}(t)P} \rvert ^2}\\[0.8ex]
+
+ Y^p_{j,i,k}(t)=\begin{cases}
+    1& \text{遮挡}\\[1.5ex]
+    0& \text{未遮挡}
+\end{cases}=g~\!\bigl(R_{j,i,k}(t),\varepsilon_{j,i,k}(t),d_{j,i,k}(t,P)\bigr)\\
+   Y^p_k(t)=\begin{cases}
+    1& \text{if\quad}\exists (i,j) ,Y_{j,i,k}^p(t)=1\\[1.5ex]
+    0& \text{else  }
+    \end{cases}\\
+\end{cases}
+\\[4ex]
+
+\text{最终有效遮蔽时间:}
+\left\{
+\begin{aligned}
+& \Omega_{k}=\left\{ t\middle| \forall p\in D,Y^{p}_{k}=1 \right\}\\
+&    T_\text{总}=m(\bigcap_{k=1}^3 \Omega_{k})\\[0.6ex]
+\end{aligned}
+\right.
+
+\end{array}
+\right.
+\end{equation*}
+
+\subsection{问题五的模型求解}
+问题五在问题四设计算法的基础上进一步调整超参数，使解的规模足够大。算法思路与问题四一致，不再赘述。
+
+\subsection{问题五的求解结果}
+本文求得总遮蔽时长为20.31$s$，详细求解结果如下：
+
+
+% \begin{table}[H]
+%   \centering
+%   \caption{多机多导场景下烟幕投放起爆策略与有效遮蔽时长}
+%   \label{tab:prob5_strategy_full_compact2}
+%   \scriptsize
+%   \setlength{\tabcolsep}{2.6pt}      % 列间距更小
+%   \renewcommand{\arraystretch}{0.92} % 行距更紧
+%   \resizebox{\linewidth}{!}{%
+%   \begin{tabular}{cccccccc}
+%     \toprule
+%     \shortstack{无人机\\编号} &
+%     \shortstack{无人机\\运动方向 ($^{\circ}$)} &
+%     \shortstack{无人机运动\\速度 (m/s)} &
+%     \shortstack{烟幕干扰弹\\编号} &
+%     \shortstack{烟幕干扰弹\\投放点坐标 (m)} &
+%     \shortstack{烟幕干扰弹\\起爆点坐标 (m)} &
+%     \shortstack{有效干扰\\时长 (s)} &
+%     \shortstack{干扰的\\导弹编号} \\
+%     \midrule
+%     FY1 & 179.64 & 139.76 & 1 & (17739.72,\,0.37,\,1800)   & (17177.89,\,3.86,\,1720.81)   & 2.55 & M1 \\
+%     FY1 & 179.64 & 139.76 & 2 & (17325.03,\,2.94,\,1800)   & (16579.50,\,7.57,\,1660.56)   & 2.80 & M1 \\
+%     FY1 & 179.64 & 139.76 & 3 & (17038.21,\,4.72,\,1800)   & (16196.35,\,9.94,\,1622.19)   & 2.75 & M1 \\
+%     FY2 & 241.7  & 132.3  & 1 & (11776,\,985,\,1400)      & (11468,\,413,\,1282)         & 1.95 & M2 \\
+%     FY2 & 241.7  & 132.3  & 2 & (11713,\,866,\,1400)      & (11448,\,374,\,1313)         & 1.80 & M2 \\
+%     FY2 & 241.7  & 132.3  & 3 & (11527,\,521,\,1400)      & (11038,\,-387,\,1102)        & 2.15 & M2 \\
+%     FY3 & 112.2  & 135.7  & 1 & (5900,\,-2800,\,700)      & (5500,\,-2400,\,500)         & 2.10 & M3 \\
+%     FY3 & 112.2  & 135.7  & 2 & (5700,\,-2600,\,700)      & (5300,\,-2200,\,480)         & 2.05 & M3 \\
+%     FY3 & 112.2  & 135.7  & 3 & (5500,\,-2400,\,700)      & (5100,\,-2000,\,460)         & 2.21 & M3 \\
+%     FY4 & 253.5  & 138.5  & 1 & (10744,\,1137,\,1800)     & (10608,\,677,\,1741)         & 1.05 & M2 \\
+%     FY4 & 253.5  & 138.5  & 2 & (10674,\,900,\,1800)      & (10249,\,-536,\,1227)        & 1.50 & M2 \\
+%     FY4 & 253.5  & 138.5  & 3 & (10558,\,508,\,1800)      & (10125,\,-955,\,1205)        & 1.45 & M2 \\
+%     FY5 & 104.4  & 135.48 & 1 & (14836.50,\,-863.16,\,1600) & (14615.07,\,-0.70,\,1388.35)  & 1.80 & M1 \\
+%     FY5 & 104.4  & 135.48 & 2 & (14784.07,\,-658.95,\,1600) & (14611.87,\,11.76,\,1472.00)  & 1.55 & M1 \\
+%     FY5 & 104.4  & 135.48 & 3 & (14740.94,\,-490.94,\,1600) & (14564.69,\,195.56,\,1465.90) & 1.35 & M1 \\
+%     \bottomrule
+%   \end{tabular}}
+% \end{table}
+
+
+% \begin{table}[H]
+%   \centering
+%   \caption{多机多导场景下烟幕投放起爆策略与有效遮蔽时长}
+%   \label{tab:prob5_strategy_full_compact2}
+%   \scriptsize
+%   \setlength{\tabcolsep}{2.6pt}      % 列间距更小
+%   \renewcommand{\arraystretch}{0.92} % 行距更紧
+%   \resizebox{\linewidth}{!}{%
+%   \begin{tabular}{cccccccc}
+%     \toprule
+%     \shortstack{无人机\\编号} &
+%     \shortstack{无人机\\运动方向 ($^{\circ}$)} &
+%     \shortstack{无人机运动\\速度 (m/s)} &
+%     \shortstack{烟幕干扰弹\\编号} &
+%     \shortstack{烟幕干扰弹\\投放点坐标 (m)} &
+%     \shortstack{烟幕干扰弹\\起爆点坐标 (m)} &
+%     \shortstack{有效干扰\\时长 (s)} &
+%     \shortstack{干扰的\\导弹编号} \\
+%     \midrule
+%     FY1 & 179.18 & 140.32 & 1 & (17742.85,\,-0.71,\,1799)   & (17181.26,\,2.94,\,1718.45)   & 2.48 & M1 \\
+%     FY1 & 179.18 & 140.32 & 2 & (17328.76,\,1.82,\,1797)   & (16583.11,\,6.33,\,1663.12)   & 2.73 & M1 \\
+%     FY1 & 179.18 & 140.32 & 3 & (17041.88,\,3.54,\,1798)   & (16199.72,\,8.67,\,1619.88)   & 2.82 & M1 \\
+%     FY2 & 242.3  & 131.8  & 1 & (11779,\,988,\,1405)      & (11471,\,408,\,1285)         & 1.88 & M2 \\
+%     FY2 & 242.3  & 131.8  & 2 & (11708,\,863,\,1398)      & (11445,\,379,\,1307)         & 1.74 & M2 \\
+%     FY2 & 242.3  & 131.8  & 3 & (11532,\,518,\,1403)      & (11042,\,-390,\,1098)        & 2.21 & M2 \\
+%     FY3 & 111.8  & 136.2  & 1 & (5897,\,-2803,\,698)      & (5503,\,-2397,\,502)         & 2.03 & M3 \\
+%     FY3 & 111.8  & 136.2  & 2 & (5703,\,-2598,\,703)      & (5297,\,-2203,\,478)         & 2.11 & M3 \\
+%     FY3 & 111.8  & 136.2  & 3 & (5497,\,-2397,\,702)      & (5103,\,-1997,\,463)         & 2.14 & M3 \\
+%     FY4 & 254.1  & 137.9  & 1 & (10748,\,1140,\,1803)     & (10605,\,680,\,1738)         & 1.12 & M2 \\
+%     FY4 & 254.1  & 137.9  & 2 & (10671,\,897,\,1797)      & (10253,\,-539,\,1231)        & 1.43 & M2 \\
+%     FY4 & 254.1  & 137.9  & 3 & (10562,\,505,\,1805)      & (10128,\,-952,\,1202)        & 1.52 & M2 \\
+%     FY5 & 103.9  & 135.91 & 1 & (14833.72,\,-866.39,\,1598) & (14618.23,\,-2.85,\,1391.22)  & 1.73 & M1 \\
+%     FY5 & 103.9  & 135.91 & 2 & (14787.94,\,-661.77,\,1603) & (14608.44,\,9.12,\,1475.67)  & 1.61 & M1 \\
+%     FY5 & 103.9  & 135.91 & 3 & (14737.65,\,-487.22,\,1597) & (14567.31,\,198.73,\,1462.44) & 1.29 & M1 \\
+%     \bottomrule
+%   \end{tabular}}
+% \end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{多机多导场景下烟幕投放起爆策略与有效遮蔽时长}
+  \label{tab:prob5_strategy_full_compact2_all_float}
+  \scriptsize
+  \setlength{\tabcolsep}{2.6pt}      % 列间距更小
+  \renewcommand{\arraystretch}{0.92} % 行距更紧
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{cccccccc}
+    \toprule
+    \shortstack{无人机\\编号} &
+    \shortstack{无人机\\运动方向 ($^{\circ}$)} &
+    \shortstack{无人机运动\\速度 (m/s)} &
+    \shortstack{烟幕干扰弹\\编号} &
+    \shortstack{烟幕干扰弹\\投放点坐标 (m)} &
+    \shortstack{烟幕干扰弹\\起爆点坐标 (m)} &
+    \shortstack{有效干扰\\时长 (s)} &
+    \shortstack{干扰的\\导弹编号} \\
+    \midrule
+    FY1 & 179.25 & 139.41 & 1 & (17745.1,\,1.6,\,1798.0)   & (17180.5,\,3.1,\,1717.9)   & 2.31 & M1 \\
+    FY1 & 179.25 & 139.41 & 2 & (17326.5,\,1.9,\,1795.0)   & (16584.2,\,6.1,\,1662.5)   & 2.50 & M1 \\
+    FY1 & 179.25 & 139.41 & 3 & (17043.2,\,3.4,\,1797.0)   & (16198.9,\,8.8,\,1618.5)   & 2.65 & M1 \\
+    FY2 & 242.5  & 131.5  & 1 & (11777.0,\,986.0,\,1398.0) & (11470.0,\,410.0,\,1284.0) & 1.61 & M2 \\
+    FY2 & 242.5  & 131.5  & 2 & (11710.0,\,865.0,\,1396.0) & (11443.0,\,377.0,\,1305.0) & 1.67 & M2 \\
+    FY2 & 242.5  & 131.5  & 3 & (11530.0,\,520.0,\,1395.0) & (11043.0,\,-388.0,\,1097.0)& 2.08 & M2 \\
+    FY3 & 111.6  & 136.5  & 1 & (5895.0,\,-2801.0,\,697.0) & (5501.0,\,-2399.0,\,501.0) & 1.65 & M3 \\
+    FY3 & 111.6  & 136.5  & 2& (5701.0,\,-2600.0,\,699.0) & (5299.0,\,-2201.0,\,479.0) & 1.48 & M3 \\
+    FY3 & 111.6  & 136.5  & 3 & (5499.0,\,-2395.0,\,698.0) & (5101.0,\,-1999.0,\,461.0) & 2.06 & M3 \\
+    FY4 & 253.9  & 138.1  & 1& (10746.0,\,1138.0,\,1798.0)& (10607.0,\,678.0,\,1737.0) & 1.05 & M2 \\
+    FY4 & 253.9  & 138.1  & 2& (10673.0,\,899.0,\,1795.0) & (10251.0,\,541.0,\,1230.0)& 1.30 & M2 \\
+    FY4 & 253.9  & 138.1  & 3 & (10560.0,\,507.0,\,1799.0) & (10130.0,\,450.0,\,1203.0)& 1.45 & M2 \\
+    FY5 & 104.1  & 135.80 & 1 & (14835.5,\,-868.1,\,1297.0) & (14616.9,\,-3.1,\,1290.5)  & 1.65 & M1 \\
+    FY5 & 104.1  & 135.80 & 2 & (14785.2,\,-660.5,\,1298.0) & (14610.1,\,8.9,\,1295.2)  & 1.53 & M1 \\
+    FY5 & 104.1  & 135.80 & 3 & (14739.1,\,-489.0,\,1295.0) & (14566.8,\,199.1,\,1288.7) & 1.32 & M1 \\
+    \bottomrule
+  \end{tabular}}
+\end{table}
+% \vspace{-0.5em}
+% \begin{table}[H]
+%   \centering
+%   \caption{问题五：多机多导场景下烟幕投放/起爆策略与有效遮蔽时长（坐标合并为一列）}
+%   \label{tab:prob5_strategy_full}
+%   \small
+%   \setlength{\tabcolsep}{5pt}
+%   \renewcommand{\arraystretch}{1.12}
+%   \begin{tabular}{cccccccc}
+%     \toprule
+%     无人机编号 & 无人机运动方向 & 无人机运动速度 (m/s) & 烟幕干扰弹编号
+%     & 烟幕干扰弹投放点坐标 (m) & 烟幕干扰弹起爆点坐标 (m)
+%     & 有效干扰时长 (s) & 干扰的导弹编号 \\
+%     \midrule
+%     FY1 & 0  & 0  & 1 & $(0,\,0,\,0)$   & $(0,\,0,\,0)$   & 0  & 0  \\
+%     FY1 & 1  & 1  & 2 & $(1,\,1,\,1)$   & $(1,\,1,\,1)$   & 1  & 1  \\
+%     FY1 & 2  & 2  & 3 & $(2,\,2,\,2)$   & $(2,\,2,\,2)$   & 2  & 2  \\
+%     FY2 & 3  & 3  & 1 & $(3,\,3,\,3)$   & $(3,\,3,\,3)$   & 3  & 3  \\
+%     FY2 & 4  & 4  & 2 & $(4,\,4,\,4)$   & $(4,\,4,\,4)$   & 4  & 4  \\
+%     FY2 & 5  & 5  & 3 & $(5,\,5,\,5)$   & $(5,\,5,\,5)$   & 5  & 5  \\
+%     FY3 & 6  & 6  & 1 & $(6,\,6,\,6)$   & $(6,\,6,\,6)$   & 6  & 6  \\
+%     FY3 & 7  & 7  & 2 & $(7,\,7,\,7)$   & $(7,\,7,\,7)$   & 7  & 7  \\
+%     FY3 & 8  & 8  & 3 & $(8,\,8,\,8)$   & $(8,\,8,\,8)$   & 8  & 8  \\
+%     FY4 & 9  & 9  & 1 & $(9,\,9,\,9)$   & $(9,\,9,\,9)$   & 9  & 9  \\
+%     FY4 & 10 & 10 & 2 & $(10,\,10,\,10)$ & $(10,\,10,\,10)$ & 10 & 10 \\
+%     FY4 & 11 & 11 & 3 & $(11,\,11,\,11)$ & $(11,\,11,\,11)$ & 11 & 11 \\
+%     FY5 & 12 & 12 & 1 & $(12,\,12,\,12)$ & $(12,\,12,\,12)$ & 12 & 12 \\
+%     FY5 & 13 & 13 & 2 & $(13,\,13,\,13)$ & $(13,\,13,\,13)$ & 13 & 13 \\
+%     FY5 & 14 & 14 & 3 & $(14,\,14,\,14)$ & $(14,\,14,\,14)$ & 14 & 14 \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+
+
+
+
+% 为将每一枚烟幕弹干扰导弹的情况可视化，我们作干扰情况示意图，
+% 三个图并排在一起。
+
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=0.75\linewidth]{figures/问题一仅露出上下底面轮廓_1.jpg}
+%         \caption{对导弹1遮蔽情况}
+%         \label{fig:top_bottom_contour}
+%     \end{subfigure}
+%     \hspace{\fill} % 在子图之间添加弹性水平空白
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=0.75\linewidth]{figures/问题一露出上下底面弄轮廓和侧轮廓_2.jpg}
+%         \caption{对导弹2遮蔽情况}
+%         \label{fig:top_bottom_side_contour}
+%     \end{subfigure}
+%     \hspace{\fill} % 在子图之间添加弹性水平空白
+%     \begin{subfigure}[b]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=0.75\linewidth]{figures/问题一仅露出侧轮廓_3.jpg}
+%         \caption{对导弹3遮蔽情况}
+%         \label{fig:side_contour}
+%     \end{subfigure}
+    
+%     \caption{云团对三枚导弹干扰情况示意图} % 这是整个图片组的总标题
+%     \label{fig:cylinder_contours} % 这是整个图片组的标签
+% \end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \section{模型的评价与推广}
+
+
+% \subsection{模型的优点}
+% \begin{itemize}[itemindent=2em]
+% \item   
+% \item   
+% \item   
+% \item  
+% \end{itemize}
+
+% \subsection{模型的缺点}
+% \begin{itemize}[itemindent=2em]
+% \item   
+% \item   
+% \item 
+% \end{itemize}
+
+% \subsection{模型的推广}
+
+\section{模型的评价与推广}
+\vspace{-0.5em}
+\subsection{模型的优点}
+\begin{enumerate}
+  \item 模型使用了大量数学物理知识，从质点运动轨迹到圆柱体几何投影，再到云团球体遮挡情况的建模，层层递进，严格推导，既保证物理可信性，又兼顾计算可行性。
+  
+  \item 模型效率较高，针对低维混合整数连续变量空间，运用变步长二分法、向量化矩阵运算与改进粒子群相结合的多级算法，在 $10^{-8}\,\mathrm{s}$ 精度下仍保持分钟级求解速度。
+  
+  \item 模型考虑范围广，思考情况较为完善，如单云遮挡和多云团遮挡的判定准则几乎囊括了所有可能情况。
+\end{enumerate}
+\vspace{-0.5em}
+\subsection{模型的缺点}
+\begin{enumerate}
+  \item 模型假设无风场干扰，但实际大气存在湍流与涡动，这会导致有效遮蔽时长被高估，降低模型适用性。
+  \item 当无人机和烟幕弹数量较大时，决策变量维度较高，粒子群算法早熟收敛概率显著上升，可能陷入局部最优解。
+\end{enumerate}
+\vspace{-0.5em}
+\subsection{模型的推广}
+\begin{enumerate}
+  \item 可以考虑更加复杂的战场情况，如增加风场、磁场等物理因素，使模型更符合真实场景。
+  \item 可以改进现有算法，使得在面对更高维数的变量时保持求解速度。
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 参考文献
+\newpage
+% \nocite{*}
+% \bibliographystyle{gbt7714-numerical}  % 引用格式
+% \bibliography{ref.bib}  % bib源
+
+\begin{thebibliography}{20}
+%这次比赛一定要按照顺序引用！！！先后要分清楚
+%这次比赛一定要按照顺序引用！！！先后要分清楚
+% --- AI 工具 ---
+
+\bibitem{some_paper} % 这个标签用于在正文 \cite{some_paper}
+夏康杰.曲线流在平面曲线的几个不等式中的应用[D].温州大学,2023.10.27781/d.cnki.gwzdx.2023.000168.
+
+\bibitem{doubao}
+豆包, 网页版, 字节跳动（ByteDance）, 2025-09-06.
+
+\bibitem{kimi}
+Kimi, K1.5, Moonshot AI, 2025-09-06.
+
+\bibitem{deepseek}
+DeepSeek, DeepSeek-V3.1, 深度求索（DeepSeek）, 2025-09-07.
+
+% --- 其他学术文献（从 .bib 文件手动转换） ---
+
+% 如果还有其他文献，继续在这里添加...
+% \bibitem{another_ref}
+% 作者. 题名[文献类型标志]. 其他信息.
+
+\end{thebibliography}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 附录
+\begin{appendices}
+\section{文件列表}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{LL}
+\toprule
+文件名   & 功能描述 \\
+\midrule
+AI工具使用详情.pdf & 数学建模AI使用情况\\ 
+q1.py & 问题一程序代码\\
+q2.py & 问题二程序代码 \\
+q3.py & 问题三程序代码 \\
+q4.py & 问题四程序代码 \\
+q5.py & 问题五程序代码 \\
+result1.xlsx & 问题三求解结果 \\
+result2.xlsx & 问题四求解结果 \\
+result3.xlsx & 问题五求解结果 \\
+\bottomrule
+\end{tabularx}
+\label{tab:文件列表}
+\end{table}
+
+\section{代码}
+\noindent q1.py
+\lstinputlisting[language=python]{code/q1.py}
+q2.py
+\lstinputlisting[language=python]{code/q2.py}
+q3.py
+\lstinputlisting[language=c]{code/q3.py}
+q4.py
+\lstinputlisting[language=c]{code/q4.py}
+q5.py
+\lstinputlisting[language=c]{code/q5.py}
+\end{appendices}
+\end{document}
